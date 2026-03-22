@@ -4,7 +4,8 @@
 当前这个版本的 PingCode 工作流管理指南，是实现了对产品模块和开发流程的管理
 
 ## 工具
-- scripts/pingcode-cli
+这个skills需要一个pingcode-client的工具来执行, 可以从[这里](https://github.com/x2x4com/pingcode-client)下载并编译，然后将编译后的二进制文件放到 scripts 中。
+- scripts/pingcode-client
 
 工具需要2个环境变量
 - PINGCODE_CLIENT_ID
@@ -24,8 +25,8 @@
 
 通过 tag 标签，来标识不同的角色，下吗的命令可以列出和创建 tag 标签
 ```
-$ pingcode-cli project tags list # 列出所有的 tag 标签
-$ pingcode-cli project tags create --name "security" # 创建一个新的 tag 标签
+$ pingcode-client project tags list # 列出所有的 tag 标签
+$ pingcode-client project tags create --name "security" # 创建一个新的 tag 标签
 ```
 
 注意标签名唯一，如果创建重复名称标签会报错
@@ -46,7 +47,7 @@ Error creating tag: create tag failed with status: 400, body: {"code":"100352","
 
 Example
 ```
-
+#TODO
 ```
 
 ### 研发经理/技术架构
@@ -54,12 +55,12 @@ Example
 #### 需求转化为技术任务
 | 步骤 | 描述 | 操作手册ID |
 | ---- | ---- | ---------- |
-| 1 | 研发经理与产品经理合作，将需求转化为技术任务 |  |
+| 1 | #TODO |  |
 
 #### 代码审核流程
 | 步骤 | 描述 | 操作手册ID |
 | ---- | ---- | ---------- |
-| 1 | 研发经理与后端开发、前端开发、安全专家合作，对代码进行审核 |  |
+| 1 | #TODO |  |
 
 
 ### 后端开发
@@ -67,20 +68,20 @@ Example
 #### 开发流程
 | 步骤 | 描述 | 操作手册ID |
 | ---- | ---- | ---------- |
-| 1 | 后端开发根据技术任务，实现产品的后端功能 |  |
+| 1 | #TODO |  |
 
 ### 前端开发
 
 #### 开发流程
 | 步骤 | 描述 | 操作手册ID |
 | ---- | ---- | ---------- |
-| 1 | 前端开发根据技术任务，实现产品的前端功能 |  |
+| 1 | #TODO |  |
 
 ### QA
-
+#TODO
 
 ### DevOps
-
+#TODO
 
 ### 安全专家
-
+#TODO

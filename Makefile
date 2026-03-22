@@ -41,3 +41,6 @@ build-linux: build-linux-amd64 build-linux-arm64
 build-darwin: build-darwin-amd64 build-darwin-arm64
 
 build: install build-linux build-darwin
+
+move-to-skills:
+	mv ${DIST}/* docs/pingcode-skills/scripts/
