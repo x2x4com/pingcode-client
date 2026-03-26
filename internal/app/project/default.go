@@ -577,6 +577,67 @@ func ListSeverities(client *sdk.Client) {
 	}
 }
 
+// ── Swimlane ───────────────────────────────────────────────────────────────
+
+func ListSwimlanes(client *sdk.Client, projectID, boardID string) {
+	swimlanes, err := client.ListSwimlanes(projectID, boardID)
+	if err != nil {
+		log.Fatalf("Error listing swimlanes: %v", err)
+	}
+	fmt.Println("Swimlanes:")
+	for _, s := range swimlanes {
+		fmt.Printf("- %s (ID: %s)\n", s.Name, s.ID)
+	}
+}
+
+func CreateSwimlane(client *sdk.Client, projectID, boardID, name string) {
+	s, err := client.CreateSwimlane(projectID, boardID, name)
+	if err != nil {
+		log.Fatalf("Error creating swimlane: %v", err)
+	}
+	fmt.Printf("Created Swimlane: %s (ID: %s)\n", s.Name, s.ID)
+}
+
+func UpdateSwimlane(client *sdk.Client, projectID, boardID, swimlaneID, name string) {
+	s, err := client.UpdateSwimlane(projectID, boardID, swimlaneID, name)
+	if err != nil {
+		log.Fatalf("Error updating swimlane: %v", err)
+	}
+	fmt.Printf("Updated Swimlane: %s (ID: %s)\n", s.Name, s.ID)
+}
+
+func DeleteSwimlane(client *sdk.Client, projectID, boardID, swimlaneID string) {
+	if err := client.DeleteSwimlane(projectID, boardID, swimlaneID); err != nil {
+		log.Fatalf("Error deleting swimlane: %v", err)
+	}
+	fmt.Printf("Deleted swimlane %s\n", swimlaneID)
+}
+
+// ── Kanban Entry CRUD ──────────────────────────────────────────────────────
+
+func CreateKanbanEntry(client *sdk.Client, projectID, boardID, name string, wipLimit int, isSplit bool, dod string) {
+	e, err := client.CreateKanbanEntry(projectID, boardID, name, wipLimit, isSplit, dod)
+	if err != nil {
+		log.Fatalf("Error creating kanban entry: %v", err)
+	}
+	fmt.Printf("Created Entry: %s (ID: %s)\n", e.Name, e.ID)
+}
+
+func UpdateKanbanEntry(client *sdk.Client, projectID, boardID, entryID, name string, wipLimit int, isSplit bool, dod string) {
+	e, err := client.UpdateKanbanEntry(projectID, boardID, entryID, name, wipLimit, isSplit, dod)
+	if err != nil {
+		log.Fatalf("Error updating kanban entry: %v", err)
+	}
+	fmt.Printf("Updated Entry: %s (ID: %s)\n", e.Name, e.ID)
+}
+
+func DeleteKanbanEntry(client *sdk.Client, projectID, boardID, entryID string) {
+	if err := client.DeleteKanbanEntry(projectID, boardID, entryID); err != nil {
+		log.Fatalf("Error deleting kanban entry: %v", err)
+	}
+	fmt.Printf("Deleted entry %s\n", entryID)
+}
+
 func Help(cmd *cobra.Command, args []string) {
 	// ctx := cmd.Context()
 	cmd.Help()

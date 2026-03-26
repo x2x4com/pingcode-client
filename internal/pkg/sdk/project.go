@@ -43,8 +43,11 @@ type Kanban struct {
 }
 
 type KanbanEntry struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID               string `json:"id"`
+	Name             string `json:"name"`
+	WipLimit         int    `json:"wip_limit,omitempty"`
+	IsSplit          bool   `json:"is_split,omitempty"`
+	DefinitionOfDone string `json:"definition_of_done,omitempty"`
 }
 
 type KanbanEntryListResponse struct {
@@ -52,6 +55,18 @@ type KanbanEntryListResponse struct {
 	Total     int           `json:"total"`
 	PageSize  int           `json:"page_size"`
 	PageIndex int           `json:"page_index"`
+}
+
+type Swimlane struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+type SwimlaneListResponse struct {
+	Values    []Swimlane `json:"values"`
+	Total     int        `json:"total"`
+	PageSize  int        `json:"page_size"`
+	PageIndex int        `json:"page_index"`
 }
 
 type ProjectMember struct {
@@ -901,4 +916,140 @@ func (c *Client) DeleteKanban(id string) error {
 	}
 
 	return nil
+}
+
+// ── Swimlane CRUD ──────────────────────────────────────────────────────────
+
+func (c *Client) ListSwimlanes(projectID, boardID string) ([]Swimlane, error) {
+resp, err := c.Request("GET", fmt.Sprintf("/project/projects/%s/boards/%s/swimlanes", projectID, boardID), nil)
+if err != nil {
+return nil, err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK {
+return nil, fmt.Errorf("list swimlanes failed with status: %d", resp.StatusCode)
+}
+var listResp SwimlaneListResponse
+if err := json.NewDecoder(resp.Body).Decode(&listResp); err != nil {
+return nil, err
+}
+return listResp.Values, nil
+}
+
+func (c *Client) CreateSwimlane(projectID, boardID, name string) (*Swimlane, error) {
+body := map[string]interface{}{"name": name}
+resp, err := c.Request("POST", fmt.Sprintf("/project/projects/%s/boards/%s/swimlanes", projectID, boardID), body)
+if err != nil {
+return nil, err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+return nil, fmt.Errorf("create swimlane failed with status: %d", resp.StatusCode)
+}
+var s Swimlane
+if err := json.NewDecoder(resp.Body).Decode(&s); err != nil {
+return nil, err
+}
+return &s, nil
+}
+
+func (c *Client) UpdateSwimlane(projectID, boardID, swimlaneID, name string) (*Swimlane, error) {
+body := map[string]interface{}{}
+if name != "" {
+body["name"] = name
+}
+resp, err := c.Request("PATCH", fmt.Sprintf("/project/projects/%s/boards/%s/swimlanes/%s", projectID, boardID, swimlaneID), body)
+if err != nil {
+return nil, err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK {
+return nil, fmt.Errorf("update swimlane failed with status: %d", resp.StatusCode)
+}
+var s Swimlane
+if err := json.NewDecoder(resp.Body).Decode(&s); err != nil {
+return nil, err
+}
+return &s, nil
+}
+
+func (c *Client) DeleteSwimlane(projectID, boardID, swimlaneID string) error {
+resp, err := c.Request("DELETE", fmt.Sprintf("/project/projects/%s/boards/%s/swimlanes/%s", projectID, boardID, swimlaneID), nil)
+if err != nil {
+return err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
+return fmt.Errorf("delete swimlane failed with status: %d", resp.StatusCode)
+}
+return nil
+}
+
+// ── Kanban Entry CRUD ──────────────────────────────────────────────────────
+
+func (c *Client) CreateKanbanEntry(projectID, boardID, name string, wipLimit int, isSplit bool, dod string) (*KanbanEntry, error) {
+body := map[string]interface{}{"name": name}
+if wipLimit > 0 {
+body["wip_limit"] = wipLimit
+}
+if isSplit {
+body["is_split"] = true
+}
+if dod != "" {
+body["definition_of_done"] = dod
+}
+resp, err := c.Request("POST", fmt.Sprintf("/project/projects/%s/boards/%s/entries", projectID, boardID), body)
+if err != nil {
+return nil, err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+return nil, fmt.Errorf("create kanban entry failed with status: %d", resp.StatusCode)
+}
+var e KanbanEntry
+if err := json.NewDecoder(resp.Body).Decode(&e); err != nil {
+return nil, err
+}
+return &e, nil
+}
+
+func (c *Client) UpdateKanbanEntry(projectID, boardID, entryID, name string, wipLimit int, isSplit bool, dod string) (*KanbanEntry, error) {
+body := map[string]interface{}{}
+if name != "" {
+body["name"] = name
+}
+if wipLimit > 0 {
+body["wip_limit"] = wipLimit
+}
+if isSplit {
+body["is_split"] = true
+}
+if dod != "" {
+body["definition_of_done"] = dod
+}
+resp, err := c.Request("PATCH", fmt.Sprintf("/project/projects/%s/boards/%s/entries/%s", projectID, boardID, entryID), body)
+if err != nil {
+return nil, err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK {
+return nil, fmt.Errorf("update kanban entry failed with status: %d", resp.StatusCode)
+}
+var e KanbanEntry
+if err := json.NewDecoder(resp.Body).Decode(&e); err != nil {
+return nil, err
+}
+return &e, nil
+}
+
+func (c *Client) DeleteKanbanEntry(projectID, boardID, entryID string) error {
+resp, err := c.Request("DELETE", fmt.Sprintf("/project/projects/%s/boards/%s/entries/%s", projectID, boardID, entryID), nil)
+if err != nil {
+return err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
+return fmt.Errorf("delete kanban entry failed with status: %d", resp.StatusCode)
+}
+return nil
 }

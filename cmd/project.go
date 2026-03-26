@@ -57,6 +57,9 @@ var (
 	tagIDs      string
 	stateIDs    string
 	versionIDs  string
+	wipLimit    int
+	isSplit     bool
+	dod         string
 )
 
 func init() {
@@ -104,6 +107,19 @@ func init() {
 	kanbanCmd.AddCommand(kanbanUpdateCmd)
 	kanbanCmd.AddCommand(kanbanDeleteCmd)
 	kanbanCmd.AddCommand(kanbanEntriesCmd)
+
+	// kanban swimlane subcommands
+	kanbanCmd.AddCommand(swimlaneCmd)
+	swimlaneCmd.AddCommand(swimlaneListCmd)
+	swimlaneCmd.AddCommand(swimlaneCreateCmd)
+	swimlaneCmd.AddCommand(swimlaneUpdateCmd)
+	swimlaneCmd.AddCommand(swimlaneDeleteCmd)
+
+	// kanban entry subcommands
+	kanbanCmd.AddCommand(entryCmd)
+	entryCmd.AddCommand(entryCreateCmd)
+	entryCmd.AddCommand(entryUpdateCmd)
+	entryCmd.AddCommand(entryDeleteCmd)
 
 	// metadata subcommands
 	projectCmd.AddCommand(metadataCmd)
@@ -267,6 +283,63 @@ func init() {
 	kanbanEntriesCmd.Flags().StringVarP(&boardID, "board-id", "b", "", "Kanban Board ID")
 	kanbanEntriesCmd.MarkFlagRequired("project-id")
 	kanbanEntriesCmd.MarkFlagRequired("board-id")
+
+	// Swimlane flags
+	swimlaneListCmd.Flags().StringVarP(&projectID, "project-id", "p", "", "PingCode Project ID")
+	swimlaneListCmd.Flags().StringVarP(&boardID, "board-id", "b", "", "Kanban Board ID")
+	swimlaneListCmd.MarkFlagRequired("project-id")
+	swimlaneListCmd.MarkFlagRequired("board-id")
+
+	swimlaneCreateCmd.Flags().StringVarP(&projectID, "project-id", "p", "", "PingCode Project ID")
+	swimlaneCreateCmd.Flags().StringVarP(&boardID, "board-id", "b", "", "Kanban Board ID")
+	swimlaneCreateCmd.Flags().StringVarP(&name, "name", "n", "", "Swimlane name")
+	swimlaneCreateCmd.MarkFlagRequired("project-id")
+	swimlaneCreateCmd.MarkFlagRequired("board-id")
+	swimlaneCreateCmd.MarkFlagRequired("name")
+
+	swimlaneUpdateCmd.Flags().StringVarP(&projectID, "project-id", "p", "", "PingCode Project ID")
+	swimlaneUpdateCmd.Flags().StringVarP(&boardID, "board-id", "b", "", "Kanban Board ID")
+	swimlaneUpdateCmd.Flags().StringVarP(&resourceID, "id", "i", "", "Swimlane ID")
+	swimlaneUpdateCmd.Flags().StringVarP(&name, "name", "n", "", "New swimlane name")
+	swimlaneUpdateCmd.MarkFlagRequired("project-id")
+	swimlaneUpdateCmd.MarkFlagRequired("board-id")
+	swimlaneUpdateCmd.MarkFlagRequired("id")
+
+	swimlaneDeleteCmd.Flags().StringVarP(&projectID, "project-id", "p", "", "PingCode Project ID")
+	swimlaneDeleteCmd.Flags().StringVarP(&boardID, "board-id", "b", "", "Kanban Board ID")
+	swimlaneDeleteCmd.Flags().StringVarP(&resourceID, "id", "i", "", "Swimlane ID")
+	swimlaneDeleteCmd.MarkFlagRequired("project-id")
+	swimlaneDeleteCmd.MarkFlagRequired("board-id")
+	swimlaneDeleteCmd.MarkFlagRequired("id")
+
+	// Entry flags
+	entryCreateCmd.Flags().StringVarP(&projectID, "project-id", "p", "", "PingCode Project ID")
+	entryCreateCmd.Flags().StringVarP(&boardID, "board-id", "b", "", "Kanban Board ID")
+	entryCreateCmd.Flags().StringVarP(&name, "name", "n", "", "Entry (column) name")
+	entryCreateCmd.Flags().IntVar(&wipLimit, "wip-limit", 0, "WIP limit (0 = unlimited)")
+	entryCreateCmd.Flags().BoolVar(&isSplit, "split", false, "Split into in-progress and done")
+	entryCreateCmd.Flags().StringVar(&dod, "dod", "", "Definition of done")
+	entryCreateCmd.MarkFlagRequired("project-id")
+	entryCreateCmd.MarkFlagRequired("board-id")
+	entryCreateCmd.MarkFlagRequired("name")
+
+	entryUpdateCmd.Flags().StringVarP(&projectID, "project-id", "p", "", "PingCode Project ID")
+	entryUpdateCmd.Flags().StringVarP(&boardID, "board-id", "b", "", "Kanban Board ID")
+	entryUpdateCmd.Flags().StringVarP(&resourceID, "id", "i", "", "Entry ID")
+	entryUpdateCmd.Flags().StringVarP(&name, "name", "n", "", "New entry name")
+	entryUpdateCmd.Flags().IntVar(&wipLimit, "wip-limit", 0, "WIP limit (0 = unlimited)")
+	entryUpdateCmd.Flags().BoolVar(&isSplit, "split", false, "Split into in-progress and done")
+	entryUpdateCmd.Flags().StringVar(&dod, "dod", "", "Definition of done")
+	entryUpdateCmd.MarkFlagRequired("project-id")
+	entryUpdateCmd.MarkFlagRequired("board-id")
+	entryUpdateCmd.MarkFlagRequired("id")
+
+	entryDeleteCmd.Flags().StringVarP(&projectID, "project-id", "p", "", "PingCode Project ID")
+	entryDeleteCmd.Flags().StringVarP(&boardID, "board-id", "b", "", "Kanban Board ID")
+	entryDeleteCmd.Flags().StringVarP(&resourceID, "id", "i", "", "Entry ID")
+	entryDeleteCmd.MarkFlagRequired("project-id")
+	entryDeleteCmd.MarkFlagRequired("board-id")
+	entryDeleteCmd.MarkFlagRequired("id")
 
 	// Metadata
 	prioritiesCmd.Flags().StringVarP(&projectID, "project-id", "p", "", "PingCode Project ID")
@@ -717,4 +790,96 @@ var statusesCmd = &cobra.Command{
 		}
 		project.ListStatuses(c)
 	},
+}
+
+// ── Swimlane commands ──────────────────────────────────────────────────────
+
+var swimlaneCmd = &cobra.Command{Use: "swimlane", Short: "泳道管理"}
+
+var swimlaneListCmd = &cobra.Command{
+Use:   "list",
+Short: "列出泳道",
+Run: func(cmd *cobra.Command, args []string) {
+c, err := GetClient()
+if err != nil {
+log.Fatal(err)
+}
+project.ListSwimlanes(c, projectID, boardID)
+},
+}
+
+var swimlaneCreateCmd = &cobra.Command{
+Use:   "create",
+Short: "创建泳道",
+Run: func(cmd *cobra.Command, args []string) {
+c, err := GetClient()
+if err != nil {
+log.Fatal(err)
+}
+project.CreateSwimlane(c, projectID, boardID, name)
+},
+}
+
+var swimlaneUpdateCmd = &cobra.Command{
+Use:   "update",
+Short: "更新泳道",
+Run: func(cmd *cobra.Command, args []string) {
+c, err := GetClient()
+if err != nil {
+log.Fatal(err)
+}
+project.UpdateSwimlane(c, projectID, boardID, resourceID, name)
+},
+}
+
+var swimlaneDeleteCmd = &cobra.Command{
+Use:   "delete",
+Short: "删除泳道",
+Run: func(cmd *cobra.Command, args []string) {
+c, err := GetClient()
+if err != nil {
+log.Fatal(err)
+}
+project.DeleteSwimlane(c, projectID, boardID, resourceID)
+},
+}
+
+// ── Entry commands ─────────────────────────────────────────────────────────
+
+var entryCmd = &cobra.Command{Use: "entry", Short: "看板栏 (Column) 管理"}
+
+var entryCreateCmd = &cobra.Command{
+Use:   "create",
+Short: "创建看板栏",
+Run: func(cmd *cobra.Command, args []string) {
+c, err := GetClient()
+if err != nil {
+log.Fatal(err)
+}
+project.CreateKanbanEntry(c, projectID, boardID, name, wipLimit, isSplit, dod)
+},
+}
+
+var entryUpdateCmd = &cobra.Command{
+Use:   "update",
+Short: "更新看板栏",
+Run: func(cmd *cobra.Command, args []string) {
+c, err := GetClient()
+if err != nil {
+log.Fatal(err)
+}
+project.UpdateKanbanEntry(c, projectID, boardID, resourceID, name, wipLimit, isSplit, dod)
+},
+}
+
+var entryDeleteCmd = &cobra.Command{
+Use:   "delete",
+Short: "删除看板栏",
+Run: func(cmd *cobra.Command, args []string) {
+c, err := GetClient()
+if err != nil {
+log.Fatal(err)
+}
+project.DeleteKanbanEntry(c, projectID, boardID, resourceID)
+},
 }
