@@ -1,3 +1,15 @@
+---
+name: pingcode-client-skill
+description: "Use when: 通过 CLI 管理 PingCode（创建/查询/更新工作项、需求/产品/版本、项目、Wiki、测试用例、组织成员）。触发词：pingcode, pingcode-client, pingcode workitem, pingcode ship, pingcode project, pingcode wiki, pingcode testhub。示例命令：pingcode-client ship ideas create；pingcode-client project workitem create。依赖：pingcode-client 二进制，需设置环境变量 PINGCODE_CLIENT_ID 和 PINGCODE_CLIENT_SECRET。"
+metadata:
+  {
+    "openclaw":
+      {
+        "requires": { "bins": ["pingcode-client"], "env": ["PINGCODE_CLIENT_ID", PINGCODE_CLIENT_SECRET] }
+      },
+  }
+---
+
 # PingCode 工作流管理指南 (CLI)
 
 ## 边界
@@ -15,6 +27,8 @@
 ### 安装方式
 
 在 skill 根目录下执行以下命令，脚本会自动检测当前系统和架构，从 GitHub Releases 下载对应版本：
+
+https://github.com/x2x4com/pingcode-client/releases
 
 ```bash
 # 下载最新版本
