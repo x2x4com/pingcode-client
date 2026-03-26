@@ -1,0 +1,92 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build ${{ matrix.artifact }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            goos: linux
+            goarch: amd64
+            cgo: "0"
+            artifact: pingcode-client.amd64
+
+          - runner: ubuntu-latest
+            goos: linux
+            goarch: arm64
+            cgo: "0"
+            artifact: pingcode-client.arm64
+
+          - runner: macos-13        # Intel — native darwin/amd64
+            goos: darwin
+            goarch: amd64
+            cgo: "1"
+            artifact: pingcode-client.darwin-amd64
+
+          - runner: macos-latest    # Apple Silicon — native darwin/arm64
+            goos: darwin
+            goarch: arm64
+            cgo: "1"
+            artifact: pingcode-client.darwin-arm64
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Build binary
+        env:
+          CGO_ENABLED: ${{ matrix.cgo }}
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+        run: |
+          VERSION=$(cat VERSION)
+          GITHASH=$(git rev-parse HEAD)
+          BUILDDATE=$(date "+%F_%H:%M:%S%z")
+          LD_FLAGS="-X 'pingcode-client/info.Version=${VERSION}' \
+                    -X 'pingcode-client/info.GitHash=${GITHASH}' \
+                    -X 'pingcode-client/info.BuildDate=${BUILDDATE}'"
+          mkdir -p dist
+          go build -ldflags="${LD_FLAGS}" -o dist/${{ matrix.artifact }} main.go
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: dist/${{ matrix.artifact }}
+          if-no-files-found: error
+
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Show artifacts
+        run: ls -lh dist/
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true
+          fail_on_unmatched_files: true

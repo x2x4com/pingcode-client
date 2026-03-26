@@ -18,7 +18,7 @@
 | **迭代 (Sprint)** | `pingcode-client project iteration list -p {pid}` | 获取迭代 ID |
 | **看板 (Board)** | `pingcode-client project kanban list -p {pid}` | 获取看板 ID |
 | **看板栏 (Entry)** | `pingcode-client project kanban entries -p {pid} -b {bid}` | 获取具体的列 ID |
-| **标签 (Tag)** | `pingcode-client project metadata tags list -p {pid}` | 获取标签 ID |
+| **标签 (Tag)** | `pingcode-client project metadata tags list` | 获取标签 ID |
 | **父工作项 (Parent)** | `pingcode-client project workitem list -p {pid}` | 获取已有工作项 ID |
 
 ---
@@ -110,7 +110,7 @@ pingcode-client project list
 #### 第二步：获取标签 ID (Tag IDs)
 找到你想要过滤的标签对应的唯一 ID。
 ```bash
-pingcode-client project metadata tags list -p 69beeb90a36e928af7cd9dab
+pingcode-client project metadata tags list
 # 假设找到 backend 的 ID 为: 69bf0cb2f4befdc8e29f63a1
 ```
 
