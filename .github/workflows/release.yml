@@ -18,25 +18,21 @@ jobs:
           - runner: ubuntu-latest
             goos: linux
             goarch: amd64
-            cgo: "0"
             artifact: pingcode-client.amd64
 
           - runner: ubuntu-latest
             goos: linux
             goarch: arm64
-            cgo: "0"
             artifact: pingcode-client.arm64
 
-          - runner: macos-13        # Intel — native darwin/amd64
+          - runner: ubuntu-latest
             goos: darwin
             goarch: amd64
-            cgo: "1"
             artifact: pingcode-client.darwin-amd64
 
-          - runner: macos-latest    # Apple Silicon — native darwin/arm64
+          - runner: ubuntu-latest
             goos: darwin
             goarch: arm64
-            cgo: "1"
             artifact: pingcode-client.darwin-arm64
 
     steps:
@@ -49,7 +45,7 @@ jobs:
 
       - name: Build binary
         env:
-          CGO_ENABLED: ${{ matrix.cgo }}
+          CGO_ENABLED: "0"
           GOOS: ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
         run: |
