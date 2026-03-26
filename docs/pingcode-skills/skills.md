@@ -4,12 +4,42 @@
 当前这个版本的 PingCode 工作流管理指南，是实现了对产品模块和开发流程的管理
 
 ## 工具
-这个skills需要一个pingcode-client的工具来执行, 可以从[这里](https://github.com/x2x4com/pingcode-client)下载并编译，然后将编译后的二进制文件放到 scripts 中。
-- scripts/pingcode-client
 
-工具需要2个环境变量
-- PINGCODE_CLIENT_ID
-- PINGCODE_CLIENT_SECRET
+本 skill 依赖 `pingcode-client` 二进制文件，需放置在 `scripts/pingcode-client`。
+
+### 安装方式
+
+在 skill 根目录下执行以下命令，脚本会自动检测当前系统和架构，从 GitHub Releases 下载对应版本：
+
+```bash
+# 下载最新版本
+bash scripts/install.sh
+
+# 或指定版本
+bash scripts/install.sh v0.1.1
+```
+
+脚本支持以下平台：
+
+| 操作系统 | 架构 | 下载文件 |
+| :------- | :--- | :------- |
+| Linux | x86_64 | `pingcode-client.amd64` |
+| Linux | ARM64 | `pingcode-client.arm64` |
+| macOS | Intel | `pingcode-client.darwin-amd64` |
+| macOS | Apple Silicon | `pingcode-client.darwin-arm64` |
+
+安装完成后 `scripts/pingcode-client` 即可直接使用。
+
+### 环境变量
+
+工具需要以下 2 个环境变量进行鉴权：
+
+```bash
+export PINGCODE_CLIENT_ID=<your_client_id>
+export PINGCODE_CLIENT_SECRET=<your_client_secret>
+```
+
+> Client ID 和 Secret 可在 PingCode 管理后台 → **开发者设置** → **OAuth 应用** 中创建获取。
 
 ## 角色
 
