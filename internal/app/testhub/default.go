@@ -85,8 +85,8 @@ func DeleteSuite(client *sdk.Client, libraryID, suiteID string) {
 	fmt.Printf("Deleted Test Suite: %s from Library: %s\n", suiteID, libraryID)
 }
 
-func ListCases(client *sdk.Client, libraryID string) {
-	cases, err := client.ListTestCases(libraryID)
+func ListCases(client *sdk.Client, libraryID, suiteID string) {
+	cases, err := client.ListTestCases(libraryID, suiteID)
 	if err != nil {
 		log.Fatalf("Error listing test cases: %v", err)
 	}

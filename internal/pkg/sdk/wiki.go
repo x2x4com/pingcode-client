@@ -191,8 +191,10 @@ func (c *Client) ListWikiSpaceMembers(spaceID string) ([]WikiSpaceMember, error)
 
 func (c *Client) AddWikiSpaceMember(spaceID, memberID, memberType, roleID string) (*WikiSpaceMember, error) {
 	body := map[string]interface{}{
-		"id":   memberID,
-		"type": memberType,
+		"member": map[string]interface{}{
+			"id":   memberID,
+			"type": memberType,
+		},
 	}
 	if roleID != "" {
 		body["role_id"] = roleID

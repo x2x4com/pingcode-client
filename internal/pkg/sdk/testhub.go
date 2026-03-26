@@ -188,8 +188,10 @@ func (c *Client) ListTestLibraryMembers(libraryID string) ([]TestLibraryMember, 
 
 func (c *Client) AddTestLibraryMember(libraryID, memberID, memberType, roleID string) (*TestLibraryMember, error) {
 	body := map[string]interface{}{
-		"id":   memberID,
-		"type": memberType,
+		"member": map[string]interface{}{
+			"id":   memberID,
+			"type": memberType,
+		},
 	}
 	if roleID != "" {
 		body["role_id"] = roleID
@@ -272,8 +274,12 @@ func (c *Client) DeleteTestSuite(libraryID, suiteID string) error {
 
 // Case operations
 
-func (c *Client) ListTestCases(libraryID string) ([]TestCase, error) {
-	resp, err := c.Request("GET", fmt.Sprintf("/testhub/cases?test_library_id=%s", libraryID), nil)
+func (c *Client) ListTestCases(libraryID, suiteID string) ([]TestCase, error) {
+	url := fmt.Sprintf("/testhub/cases?library_id=%s", libraryID)
+	if suiteID != "" {
+		url += "&suite_id=" + suiteID
+	}
+	resp, err := c.Request("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}

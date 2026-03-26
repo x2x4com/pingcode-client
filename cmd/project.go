@@ -215,6 +215,8 @@ func init() {
 	workitemListCmd.Flags().StringVarP(&projectID, "project-id", "p", "", "PingCode Project ID")
 	workitemListCmd.Flags().StringVar(&tagIDs, "tag-ids", "", "Filter by Tag IDs (comma separated)")
 	workitemListCmd.Flags().StringVar(&stateIDs, "state-ids", "", "Filter by State IDs (comma separated)")
+	workitemListCmd.Flags().StringVar(&sprintID, "sprint-id", "", "Filter by Sprint/Iteration ID")
+	workitemListCmd.Flags().StringVar(&assignee, "assignee-id", "", "Filter by Assignee user ID")
 	workitemListCmd.MarkFlagRequired("project-id")
 
 	workitemGetCmd.Flags().StringVarP(&resourceID, "id", "i", "", "WorkItem ID")
@@ -857,7 +859,7 @@ var workitemListCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.ListWorkItems(c, projectID, tagIDs, stateIDs)
+		project.ListWorkItems(c, projectID, tagIDs, stateIDs, sprintID, assignee)
 	},
 }
 var workitemGetCmd = &cobra.Command{
@@ -981,13 +983,9 @@ var iterationUpdateCmd = &cobra.Command{
 }
 var iterationDeleteCmd = &cobra.Command{
 	Use:   "delete",
-	Short: "删除迭代",
+	Short: "删除迭代 (PingCode API 暂不支持，仅保留占位)",
 	Run: func(cmd *cobra.Command, args []string) {
-		c, err := GetClient()
-		if err != nil {
-			log.Fatal(err)
-		}
-		project.DeleteIteration(c, projectID, resourceID)
+		log.Fatal("PingCode API 不支持删除迭代 (sprint)，请在 Web 界面操作。")
 	},
 }
 

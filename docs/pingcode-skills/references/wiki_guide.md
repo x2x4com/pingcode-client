@@ -52,7 +52,8 @@
   ```
 - **添加成员**:
   ```bash
-  pingcode-client wiki space member add -i {space_id} --member-id {uid} --member-type user
+  # role_id 需要使用系统角色ID（管理员: 100000000000000000000001）
+  pingcode-client wiki space member add -i {space_id} --member-id {uid} --member-type user --role-id 100000000000000000000001
   ```
 - **移除成员**:
   ```bash
@@ -117,8 +118,8 @@ pingcode-client wiki space create -n "技术文档" --identifier "TECH" --scope-
 # 2. 获取新建空间 ID
 pingcode-client wiki space list
 
-# 3. 添加团队成员
-pingcode-client wiki space member add -i {space_id} --member-id {uid} --member-type user
+# 3. 添加团队成员（role_id: 100000000000000000000001 = 管理员）
+pingcode-client wiki space member add -i {space_id} --member-id {uid} --member-type user --role-id 100000000000000000000001
 
 # 4. 创建文档结构
 pingcode-client wiki page create -s {space_id} -n "架构设计" --type folder

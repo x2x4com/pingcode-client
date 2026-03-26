@@ -107,7 +107,135 @@ pingcode-client ship ideas create \
   --desc "用户可通过 GitHub / Google 账号授权登录，减少注册摩擦，提升转化率"
 ```
 
+#### 需求评审准备（提交研发评审前）
+| 步骤 | 描述 | 操作手册ID |
+| ---- | ---- | ---------- |
+| 1 | 查询已创建的需求，确认需要进入评审的清单 | 参考 `references/ship_guide.md` 需求列表 |
+| 2 | 将需求状态更新为"评审中"，通知研发经理 | 参考 `references/ship_guide.md` 更新需求 |
+| 3 | 在对应项目中预创建 Epic/Story 占位，记录需求背景和验收标准 | 参考 `references/workitem_guide.md` 创建工作项 |
+| 4 | 轮询或查询研发经理反馈（工作项描述/评论记录） | 参考 `references/workitem_guide.md` 查看工作项详情 |
+
+Example
+```bash
+# 步骤 1: 查询待评审需求
+pingcode-client ship ideas list --product-id {product_id} --state-id {reviewing_state_id}
+
+# 步骤 2: 更新需求状态为评审中
+pingcode-client ship ideas update \
+  --idea-id {idea_id} \
+  --state-id {reviewing_state_id}
+
+# 步骤 3: 在项目中创建 Epic 占位（提前预排）
+pingcode-client project workitem create \
+  --project-id {project_id} \
+  --type-id epic \
+  --title "[需求评审中] 用户登录支持第三方 OAuth" \
+  --desc "验收标准：\n1. 支持 GitHub / Google OAuth\n2. 登录成功后跳转首页\n3. 已登录用户不重复鉴权"
+
+# 步骤 4: 查看工作项（研发经理会在描述中写反馈）
+pingcode-client project workitem get -i {epic_id}
+```
+
+#### 接收研发反馈 / 需求变更流程
+| 步骤 | 描述 | 操作手册ID |
+| ---- | ---- | ---------- |
+| 1 | 研发评审后，查看工作项最新描述，了解技术风险、工期估算、方案建议 | 参考 `references/workitem_guide.md` 查看工作项详情 |
+| 2 | 与研发经理确认：可行→将需求状态更新为"已确认"；不可行→修改需求范围后重新提交 | 参考 `references/ship_guide.md` 更新需求 |
+| 3 | 需求变更时：更新 Epic/Story 描述，调整优先级，并通知相关方 | 参考 `references/workitem_guide.md` 更新工作项 |
+| 4 | 优先级变更：调整需求/工作项优先级，确保迭代排期合理 | 参考 `references/workitem_guide.md` 更新工作项 |
+
+Example
+```bash
+# 步骤 1: 查看研发反馈（研发经理会更新工作项描述）
+pingcode-client project workitem get -i {epic_id}
+
+# 步骤 2a: 研发可行 → 更新需求状态为已确认（进入排期）
+pingcode-client ship ideas update \
+  --idea-id {idea_id} \
+  --state-id {confirmed_state_id}
+
+# 步骤 2b: 研发不可行 → 修改需求描述，缩减范围后重新提交
+pingcode-client ship ideas update \
+  --idea-id {idea_id} \
+  --desc "【缩减范围】暂仅支持 GitHub OAuth，Google OAuth 留待下一迭代"
+
+# 步骤 3: 需求变更时更新对应 Epic 的描述和优先级
+pingcode-client project workitem update \
+  -i {epic_id} \
+  --desc "【变更】仅支持 GitHub OAuth。原因：Google API 申请需要审核，预计 2 周" \
+  --priority-id {high_priority_id}
+```
+
 ### 研发经理/技术架构
+
+#### 技术可行性评审流程（接收 PM 需求后）
+| 步骤 | 描述 | 操作手册ID |
+| ---- | ---- | ---------- |
+| 1 | 获取"评审中"状态的需求或 Epic 工作项，了解产品意图和验收标准 | 参考 `references/ship_guide.md` 需求列表 |
+| 2 | 评估技术可行性：复杂度、风险点、依赖项、工期估算 | —（线下沟通后写入工作项描述） |
+| 3 | 将评审结果写入 Epic 工作项描述，给出明确结论（可行/不可行/需调整范围） | 参考 `references/workitem_guide.md` 更新工作项 |
+| 4 | 若涉及技术风险：创建 Bug/Issue 类型工作项记录风险，关联到 Epic | 参考 `references/workitem_guide.md` 工作项关联 |
+
+Example
+```bash
+# 步骤 1: 查询 Epic 工作项（由 PM 提前创建）
+pingcode-client project workitem list \
+  --project-id {project_id} \
+  --type-id epic
+
+# 步骤 2: 获取工作项详情，了解验收标准
+pingcode-client project workitem get -i {epic_id}
+
+# 步骤 3: 将技术评审结果写入描述
+pingcode-client project workitem update \
+  -i {epic_id} \
+  --desc "【技术评审结论】可行。\n\n技术方案：使用 Passport.js + OAuth2 策略。\n工期估算：后端 3 天 + 前端 2 天 + 测试 1 天。\n风险点：Google API 审核周期不确定，建议先实现 GitHub。"
+
+# 步骤 4: 技术风险较大时，创建 Issue 记录并关联
+pingcode-client project workitem create \
+  --project-id {project_id} \
+  --type-id issue \
+  --title "[技术风险] Google OAuth API 申请需要审核，存在延期风险" \
+  --assignee-id {arch_member_id}
+pingcode-client project workitem relation add \
+  -i {epic_id} \
+  --target-id {issue_id} \
+  --type relate
+```
+
+#### 迭代规划流程（Sprint Backlog 组织）
+| 步骤 | 描述 | 操作手册ID |
+| ---- | ---- | ---------- |
+| 1 | 查询当前迭代状态，获取迭代 ID | 参考 `references/project_guide.md` 迭代管理 |
+| 2 | 从已确认需求中，选取本迭代要实现的 Story/Epic，关联到当前迭代 | 参考 `references/workitem_guide.md` 更新工作项 |
+| 3 | 将 Story 拆解为具体子任务（task），分配给成员，打角色标签 | 参考 `references/workitem_guide.md` 创建/关联工作项 |
+| 4 | 迭代负载评估：查询本迭代所有工作项，确认工作量合理 | 参考 `references/workitem_guide.md` 组合过滤查询 |
+
+Example
+```bash
+# 步骤 1: 查看当前迭代（Scrum 项目）
+pingcode-client project iteration list --project-id {project_id}
+
+# 步骤 2: 将确认的需求 Story 关联到当前迭代
+pingcode-client project workitem update \
+  -i {story_id} \
+  --sprint-id {current_iteration_id}
+
+# 步骤 3: 拆解子任务并打标签
+pingcode-client project workitem create \
+  --project-id {project_id} \
+  --title "后端: 实现 OAuth 回调接口" \
+  --type-id task \
+  --assignee-id {backend_member_id} \
+  --parent-id {story_id} \
+  --sprint-id {current_iteration_id}
+pingcode-client project workitem tag add -i {task_id} -t {backend_tag_id}
+
+# 步骤 4: 查询本迭代所有工作项评估负载
+pingcode-client project workitem list \
+  --project-id {project_id} \
+  --sprint-id {current_iteration_id}
+```
 
 #### 需求转化为技术任务
 | 步骤 | 描述 | 操作手册ID |

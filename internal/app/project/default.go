@@ -420,7 +420,7 @@ func DeleteKanban(client *sdk.Client, id string) {
 	fmt.Printf("Deleted Kanban: %s\n", id)
 }
 
-func ListWorkItems(client *sdk.Client, projectID string, tagIDs string, stateIDs string) {
+func ListWorkItems(client *sdk.Client, projectID string, tagIDs string, stateIDs string, sprintID string, assigneeID string) {
 	filters := url.Values{}
 	if projectID != "" {
 		filters.Add("project_ids", projectID)
@@ -430,6 +430,12 @@ func ListWorkItems(client *sdk.Client, projectID string, tagIDs string, stateIDs
 	}
 	if stateIDs != "" {
 		filters.Add("state_ids", stateIDs)
+	}
+	if sprintID != "" {
+		filters.Add("sprint_id", sprintID)
+	}
+	if assigneeID != "" {
+		filters.Add("assignee_id", assigneeID)
 	}
 
 	log.Println("Listing work items...")

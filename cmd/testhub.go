@@ -186,7 +186,7 @@ var thCaseListCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to get client: %v", err)
 		}
-		testhub.ListCases(c, thLibraryID)
+		testhub.ListCases(c, thLibraryID, thSuiteID)
 	},
 }
 
@@ -373,6 +373,7 @@ func init() {
 
 	// case flags
 	thCaseListCmd.Flags().StringVar(&thLibraryID, "library-id", "", "Library ID")
+	thCaseListCmd.Flags().StringVar(&thSuiteID, "suite-id", "", "Filter by Suite ID")
 	thCaseListCmd.MarkFlagRequired("library-id")
 
 	thCaseGetCmd.Flags().StringVar(&thCaseID, "id", "", "Case ID")

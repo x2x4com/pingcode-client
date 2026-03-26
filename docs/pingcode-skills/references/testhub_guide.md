@@ -46,11 +46,12 @@
   ```
 - **添加成员**:
   ```bash
+  # role_id 需使用系统角色ID（管理员: 100000000000000000000001）
   pingcode-client testhub library member add \
     --library-id {lib_id} \
     --member-id {user_id} \
     --member-type user \
-    --role-id {role_id}
+    --role-id 100000000000000000000001
   ```
 - **移除成员**:
   ```bash
@@ -79,6 +80,8 @@
 - **列出测试用例**:
   ```bash
   pingcode-client testhub case list --library-id {lib_id}
+  # 按模块过滤（可选）
+  pingcode-client testhub case list --library-id {lib_id} --suite-id {suite_id}
   ```
 - **获取用例详情**:
   ```bash
