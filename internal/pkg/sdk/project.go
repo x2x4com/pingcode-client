@@ -1261,3 +1261,307 @@ return nil, err
 }
 return listResp.Values, nil
 }
+
+// ── Sprint Sections ────────────────────────────────────────────────────────
+
+type SprintSection struct {
+ID   string `json:"id"`
+Name string `json:"name"`
+}
+
+type SprintSectionListResponse struct {
+Values    []SprintSection `json:"values"`
+Total     int             `json:"total"`
+PageSize  int             `json:"page_size"`
+PageIndex int             `json:"page_index"`
+}
+
+type SprintCategory struct {
+ID        string         `json:"id"`
+Name      string         `json:"name"`
+SectionID string         `json:"section_id,omitempty"`
+Section   *SprintSection `json:"section,omitempty"`
+}
+
+type SprintCategoryListResponse struct {
+Values    []SprintCategory `json:"values"`
+Total     int              `json:"total"`
+PageSize  int              `json:"page_size"`
+PageIndex int              `json:"page_index"`
+}
+
+type VersionSection struct {
+ID   string `json:"id"`
+Name string `json:"name"`
+}
+
+type VersionSectionListResponse struct {
+Values    []VersionSection `json:"values"`
+Total     int              `json:"total"`
+PageSize  int              `json:"page_size"`
+PageIndex int              `json:"page_index"`
+}
+
+type VersionCategory struct {
+ID        string          `json:"id"`
+Name      string          `json:"name"`
+SectionID string          `json:"section_id,omitempty"`
+Section   *VersionSection `json:"section,omitempty"`
+}
+
+type VersionCategoryListResponse struct {
+Values    []VersionCategory `json:"values"`
+Total     int               `json:"total"`
+PageSize  int               `json:"page_size"`
+PageIndex int               `json:"page_index"`
+}
+
+func (c *Client) ListSprintSections(projectID string) ([]SprintSection, error) {
+resp, err := c.Request("GET", fmt.Sprintf("/project/projects/%s/sprint_sections", projectID), nil)
+if err != nil {
+return nil, err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK {
+return nil, fmt.Errorf("list sprint sections failed with status: %d", resp.StatusCode)
+}
+var r SprintSectionListResponse
+if err := json.NewDecoder(resp.Body).Decode(&r); err != nil {
+return nil, err
+}
+return r.Values, nil
+}
+
+func (c *Client) CreateSprintSection(projectID, name string) (*SprintSection, error) {
+resp, err := c.Request("POST", fmt.Sprintf("/project/projects/%s/sprint_sections", projectID), map[string]interface{}{"name": name})
+if err != nil {
+return nil, err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+return nil, fmt.Errorf("create sprint section failed with status: %d", resp.StatusCode)
+}
+var s SprintSection
+if err := json.NewDecoder(resp.Body).Decode(&s); err != nil {
+return nil, err
+}
+return &s, nil
+}
+
+func (c *Client) UpdateSprintSection(projectID, sectionID, name string) (*SprintSection, error) {
+resp, err := c.Request("PATCH", fmt.Sprintf("/project/projects/%s/sprint_sections/%s", projectID, sectionID), map[string]interface{}{"name": name})
+if err != nil {
+return nil, err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK {
+return nil, fmt.Errorf("update sprint section failed with status: %d", resp.StatusCode)
+}
+var s SprintSection
+if err := json.NewDecoder(resp.Body).Decode(&s); err != nil {
+return nil, err
+}
+return &s, nil
+}
+
+func (c *Client) DeleteSprintSection(projectID, sectionID string) error {
+resp, err := c.Request("DELETE", fmt.Sprintf("/project/projects/%s/sprint_sections/%s", projectID, sectionID), nil)
+if err != nil {
+return err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
+return fmt.Errorf("delete sprint section failed with status: %d", resp.StatusCode)
+}
+return nil
+}
+
+func (c *Client) ListSprintCategories(projectID string) ([]SprintCategory, error) {
+resp, err := c.Request("GET", fmt.Sprintf("/project/projects/%s/sprint_categories", projectID), nil)
+if err != nil {
+return nil, err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK {
+return nil, fmt.Errorf("list sprint categories failed with status: %d", resp.StatusCode)
+}
+var r SprintCategoryListResponse
+if err := json.NewDecoder(resp.Body).Decode(&r); err != nil {
+return nil, err
+}
+return r.Values, nil
+}
+
+func (c *Client) CreateSprintCategory(projectID, name, sectionID string) (*SprintCategory, error) {
+body := map[string]interface{}{"name": name}
+if sectionID != "" {
+body["section_id"] = sectionID
+}
+resp, err := c.Request("POST", fmt.Sprintf("/project/projects/%s/sprint_categories", projectID), body)
+if err != nil {
+return nil, err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+return nil, fmt.Errorf("create sprint category failed with status: %d", resp.StatusCode)
+}
+var cat SprintCategory
+if err := json.NewDecoder(resp.Body).Decode(&cat); err != nil {
+return nil, err
+}
+return &cat, nil
+}
+
+func (c *Client) UpdateSprintCategory(projectID, categoryID, name string) (*SprintCategory, error) {
+resp, err := c.Request("PATCH", fmt.Sprintf("/project/projects/%s/sprint_categories/%s", projectID, categoryID), map[string]interface{}{"name": name})
+if err != nil {
+return nil, err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK {
+return nil, fmt.Errorf("update sprint category failed with status: %d", resp.StatusCode)
+}
+var cat SprintCategory
+if err := json.NewDecoder(resp.Body).Decode(&cat); err != nil {
+return nil, err
+}
+return &cat, nil
+}
+
+func (c *Client) DeleteSprintCategory(projectID, categoryID string) error {
+resp, err := c.Request("DELETE", fmt.Sprintf("/project/projects/%s/sprint_categories/%s", projectID, categoryID), nil)
+if err != nil {
+return err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
+return fmt.Errorf("delete sprint category failed with status: %d", resp.StatusCode)
+}
+return nil
+}
+
+// ── Version Sections ───────────────────────────────────────────────────────
+
+func (c *Client) ListVersionSections(projectID string) ([]VersionSection, error) {
+resp, err := c.Request("GET", fmt.Sprintf("/project/projects/%s/version_sections", projectID), nil)
+if err != nil {
+return nil, err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK {
+return nil, fmt.Errorf("list version sections failed with status: %d", resp.StatusCode)
+}
+var r VersionSectionListResponse
+if err := json.NewDecoder(resp.Body).Decode(&r); err != nil {
+return nil, err
+}
+return r.Values, nil
+}
+
+func (c *Client) CreateVersionSection(projectID, name string) (*VersionSection, error) {
+resp, err := c.Request("POST", fmt.Sprintf("/project/projects/%s/version_sections", projectID), map[string]interface{}{"name": name})
+if err != nil {
+return nil, err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+return nil, fmt.Errorf("create version section failed with status: %d", resp.StatusCode)
+}
+var s VersionSection
+if err := json.NewDecoder(resp.Body).Decode(&s); err != nil {
+return nil, err
+}
+return &s, nil
+}
+
+func (c *Client) UpdateVersionSection(projectID, sectionID, name string) (*VersionSection, error) {
+resp, err := c.Request("PATCH", fmt.Sprintf("/project/projects/%s/version_sections/%s", projectID, sectionID), map[string]interface{}{"name": name})
+if err != nil {
+return nil, err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK {
+return nil, fmt.Errorf("update version section failed with status: %d", resp.StatusCode)
+}
+var s VersionSection
+if err := json.NewDecoder(resp.Body).Decode(&s); err != nil {
+return nil, err
+}
+return &s, nil
+}
+
+func (c *Client) DeleteVersionSection(projectID, sectionID string) error {
+resp, err := c.Request("DELETE", fmt.Sprintf("/project/projects/%s/version_sections/%s", projectID, sectionID), nil)
+if err != nil {
+return err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
+return fmt.Errorf("delete version section failed with status: %d", resp.StatusCode)
+}
+return nil
+}
+
+func (c *Client) ListVersionCategories(projectID string) ([]VersionCategory, error) {
+resp, err := c.Request("GET", fmt.Sprintf("/project/projects/%s/version_categories", projectID), nil)
+if err != nil {
+return nil, err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK {
+return nil, fmt.Errorf("list version categories failed with status: %d", resp.StatusCode)
+}
+var r VersionCategoryListResponse
+if err := json.NewDecoder(resp.Body).Decode(&r); err != nil {
+return nil, err
+}
+return r.Values, nil
+}
+
+func (c *Client) CreateVersionCategory(projectID, name, sectionID string) (*VersionCategory, error) {
+body := map[string]interface{}{"name": name}
+if sectionID != "" {
+body["section_id"] = sectionID
+}
+resp, err := c.Request("POST", fmt.Sprintf("/project/projects/%s/version_categories", projectID), body)
+if err != nil {
+return nil, err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+return nil, fmt.Errorf("create version category failed with status: %d", resp.StatusCode)
+}
+var cat VersionCategory
+if err := json.NewDecoder(resp.Body).Decode(&cat); err != nil {
+return nil, err
+}
+return &cat, nil
+}
+
+func (c *Client) UpdateVersionCategory(projectID, categoryID, name string) (*VersionCategory, error) {
+resp, err := c.Request("PATCH", fmt.Sprintf("/project/projects/%s/version_categories/%s", projectID, categoryID), map[string]interface{}{"name": name})
+if err != nil {
+return nil, err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK {
+return nil, fmt.Errorf("update version category failed with status: %d", resp.StatusCode)
+}
+var cat VersionCategory
+if err := json.NewDecoder(resp.Body).Decode(&cat); err != nil {
+return nil, err
+}
+return &cat, nil
+}
+
+func (c *Client) DeleteVersionCategory(projectID, categoryID string) error {
+resp, err := c.Request("DELETE", fmt.Sprintf("/project/projects/%s/version_categories/%s", projectID, categoryID), nil)
+if err != nil {
+return err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
+return fmt.Errorf("delete version category failed with status: %d", resp.StatusCode)
+}
+return nil
+}

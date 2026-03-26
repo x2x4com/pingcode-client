@@ -772,6 +772,198 @@ func ListWorkItemTransitionHistories(client *sdk.Client, workItemID string) {
 	}
 }
 
+// ── Sprint Sections ────────────────────────────────────────────────────────
+
+func ListSprintSections(client *sdk.Client, projectID string) {
+	if projectID == "" {
+		log.Fatal("Project ID is required")
+	}
+	sections, err := client.ListSprintSections(projectID)
+	if err != nil {
+		log.Fatalf("Error listing sprint sections: %v", err)
+	}
+	fmt.Println("Sprint Sections:")
+	for _, s := range sections {
+		fmt.Printf("- %s (ID: %s)\n", s.Name, s.ID)
+	}
+}
+
+func CreateSprintSection(client *sdk.Client, projectID, name string) {
+	if projectID == "" || name == "" {
+		log.Fatal("Project ID and name are required")
+	}
+	s, err := client.CreateSprintSection(projectID, name)
+	if err != nil {
+		log.Fatalf("Error creating sprint section: %v", err)
+	}
+	fmt.Printf("Created Section: %s (ID: %s)\n", s.Name, s.ID)
+}
+
+func UpdateSprintSection(client *sdk.Client, projectID, sectionID, name string) {
+	if projectID == "" || sectionID == "" || name == "" {
+		log.Fatal("Project ID, section ID, and name are required")
+	}
+	s, err := client.UpdateSprintSection(projectID, sectionID, name)
+	if err != nil {
+		log.Fatalf("Error updating sprint section: %v", err)
+	}
+	fmt.Printf("Updated Section: %s (ID: %s)\n", s.Name, s.ID)
+}
+
+func DeleteSprintSection(client *sdk.Client, projectID, sectionID string) {
+	if projectID == "" || sectionID == "" {
+		log.Fatal("Project ID and section ID are required")
+	}
+	err := client.DeleteSprintSection(projectID, sectionID)
+	if err != nil {
+		log.Fatalf("Error deleting sprint section: %v", err)
+	}
+	fmt.Printf("Deleted section %s\n", sectionID)
+}
+
+func ListSprintCategories(client *sdk.Client, projectID string) {
+	if projectID == "" {
+		log.Fatal("Project ID is required")
+	}
+	cats, err := client.ListSprintCategories(projectID)
+	if err != nil {
+		log.Fatalf("Error listing sprint categories: %v", err)
+	}
+	fmt.Println("Sprint Categories:")
+	for _, c := range cats {
+		fmt.Printf("- %s (ID: %s)\n", c.Name, c.ID)
+	}
+}
+
+func CreateSprintCategory(client *sdk.Client, projectID, name, sectionID string) {
+	if projectID == "" || name == "" {
+		log.Fatal("Project ID and name are required")
+	}
+	cat, err := client.CreateSprintCategory(projectID, name, sectionID)
+	if err != nil {
+		log.Fatalf("Error creating sprint category: %v", err)
+	}
+	fmt.Printf("Created Category: %s (ID: %s)\n", cat.Name, cat.ID)
+}
+
+func UpdateSprintCategory(client *sdk.Client, projectID, categoryID, name string) {
+	if projectID == "" || categoryID == "" || name == "" {
+		log.Fatal("Project ID, category ID, and name are required")
+	}
+	cat, err := client.UpdateSprintCategory(projectID, categoryID, name)
+	if err != nil {
+		log.Fatalf("Error updating sprint category: %v", err)
+	}
+	fmt.Printf("Updated Category: %s (ID: %s)\n", cat.Name, cat.ID)
+}
+
+func DeleteSprintCategory(client *sdk.Client, projectID, categoryID string) {
+	if projectID == "" || categoryID == "" {
+		log.Fatal("Project ID and category ID are required")
+	}
+	err := client.DeleteSprintCategory(projectID, categoryID)
+	if err != nil {
+		log.Fatalf("Error deleting sprint category: %v", err)
+	}
+	fmt.Printf("Deleted category %s\n", categoryID)
+}
+
+// ── Version Sections ───────────────────────────────────────────────────────
+
+func ListVersionSections(client *sdk.Client, projectID string) {
+	if projectID == "" {
+		log.Fatal("Project ID is required")
+	}
+	sections, err := client.ListVersionSections(projectID)
+	if err != nil {
+		log.Fatalf("Error listing version sections: %v", err)
+	}
+	fmt.Println("Version Sections:")
+	for _, s := range sections {
+		fmt.Printf("- %s (ID: %s)\n", s.Name, s.ID)
+	}
+}
+
+func CreateVersionSection(client *sdk.Client, projectID, name string) {
+	if projectID == "" || name == "" {
+		log.Fatal("Project ID and name are required")
+	}
+	s, err := client.CreateVersionSection(projectID, name)
+	if err != nil {
+		log.Fatalf("Error creating version section: %v", err)
+	}
+	fmt.Printf("Created Section: %s (ID: %s)\n", s.Name, s.ID)
+}
+
+func UpdateVersionSection(client *sdk.Client, projectID, sectionID, name string) {
+	if projectID == "" || sectionID == "" || name == "" {
+		log.Fatal("Project ID, section ID, and name are required")
+	}
+	s, err := client.UpdateVersionSection(projectID, sectionID, name)
+	if err != nil {
+		log.Fatalf("Error updating version section: %v", err)
+	}
+	fmt.Printf("Updated Section: %s (ID: %s)\n", s.Name, s.ID)
+}
+
+func DeleteVersionSection(client *sdk.Client, projectID, sectionID string) {
+	if projectID == "" || sectionID == "" {
+		log.Fatal("Project ID and section ID are required")
+	}
+	err := client.DeleteVersionSection(projectID, sectionID)
+	if err != nil {
+		log.Fatalf("Error deleting version section: %v", err)
+	}
+	fmt.Printf("Deleted section %s\n", sectionID)
+}
+
+func ListVersionCategories(client *sdk.Client, projectID string) {
+	if projectID == "" {
+		log.Fatal("Project ID is required")
+	}
+	cats, err := client.ListVersionCategories(projectID)
+	if err != nil {
+		log.Fatalf("Error listing version categories: %v", err)
+	}
+	fmt.Println("Version Categories:")
+	for _, c := range cats {
+		fmt.Printf("- %s (ID: %s)\n", c.Name, c.ID)
+	}
+}
+
+func CreateVersionCategory(client *sdk.Client, projectID, name, sectionID string) {
+	if projectID == "" || name == "" {
+		log.Fatal("Project ID and name are required")
+	}
+	cat, err := client.CreateVersionCategory(projectID, name, sectionID)
+	if err != nil {
+		log.Fatalf("Error creating version category: %v", err)
+	}
+	fmt.Printf("Created Category: %s (ID: %s)\n", cat.Name, cat.ID)
+}
+
+func UpdateVersionCategory(client *sdk.Client, projectID, categoryID, name string) {
+	if projectID == "" || categoryID == "" || name == "" {
+		log.Fatal("Project ID, category ID, and name are required")
+	}
+	cat, err := client.UpdateVersionCategory(projectID, categoryID, name)
+	if err != nil {
+		log.Fatalf("Error updating version category: %v", err)
+	}
+	fmt.Printf("Updated Category: %s (ID: %s)\n", cat.Name, cat.ID)
+}
+
+func DeleteVersionCategory(client *sdk.Client, projectID, categoryID string) {
+	if projectID == "" || categoryID == "" {
+		log.Fatal("Project ID and category ID are required")
+	}
+	err := client.DeleteVersionCategory(projectID, categoryID)
+	if err != nil {
+		log.Fatalf("Error deleting version category: %v", err)
+	}
+	fmt.Printf("Deleted category %s\n", categoryID)
+}
+
 func Help(cmd *cobra.Command, args []string) {
 	// ctx := cmd.Context()
 	cmd.Help()
