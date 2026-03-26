@@ -1,4 +1,5 @@
 /docs/refers/
 .DS_Store
 docs/pingcode-skills/scripts/pingcode-client
-.envbin/
+.env
+bin/
