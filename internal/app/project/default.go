@@ -6,9 +6,23 @@ import (
 	"net/url"
 	"pingcode-client/internal/pkg/sdk"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 )
+
+// parseDateToMs converts "YYYY-MM-DD" to Unix milliseconds (UTC midnight).
+// Returns 0 if the string is empty or unparseable.
+func parseDateToMs(s string) int64 {
+	if s == "" {
+		return 0
+	}
+	t, err := time.Parse("2006-01-02", s)
+	if err != nil {
+		log.Fatalf("Invalid date format %q, expected YYYY-MM-DD", s)
+	}
+	return t.UTC().UnixMilli()
+}
 
 func ListProjects(client *sdk.Client) {
 	log.Println("Listing projects...")
@@ -107,7 +121,7 @@ func GetWorkItem(client *sdk.Client, id string, identifier string) {
 		item.Title, item.ID, item.Identifier, item.Type, stateName, priorityName, assigneeName, boardName, entryName, tagsStr)
 }
 
-func CreateWorkItem(client *sdk.Client, projectID, title, desc, iType, typeID, stateID, priorityID, assigneeID, sprintID, boardID, entryID, swimlaneID, parentID string) {
+func CreateWorkItem(client *sdk.Client, projectID, title, desc, iType, typeID, stateID, priorityID, assigneeID, sprintID, boardID, entryID, swimlaneID, parentID string, versionIDs []string) {
 	if projectID == "" || title == "" {
 		log.Fatal("Project ID and Title are required")
 	}
@@ -124,6 +138,7 @@ func CreateWorkItem(client *sdk.Client, projectID, title, desc, iType, typeID, s
 		EntryID:    entryID,
 		SwimlaneID: swimlaneID,
 		ParentID:   parentID,
+		VersionIDs: versionIDs,
 	}
 	created, err := client.CreateWorkItem(item)
 	if err != nil {
@@ -132,7 +147,7 @@ func CreateWorkItem(client *sdk.Client, projectID, title, desc, iType, typeID, s
 	fmt.Printf("Created WorkItem: %s (ID: %s, Identifier: %s)\n", created.Title, created.ID, created.Identifier)
 }
 
-func UpdateWorkItem(client *sdk.Client, id, title, desc, stateID, priorityID, assigneeID, sprintID, boardID, entryID, swimlaneID, parentID string) {
+func UpdateWorkItem(client *sdk.Client, id, title, desc, stateID, priorityID, assigneeID, sprintID, boardID, entryID, swimlaneID, parentID string, versionIDs []string) {
 	if id == "" {
 		log.Fatal("WorkItem ID is required")
 	}
@@ -147,6 +162,7 @@ func UpdateWorkItem(client *sdk.Client, id, title, desc, stateID, priorityID, as
 		EntryID:    entryID,
 		SwimlaneID: swimlaneID,
 		ParentID:   parentID,
+		VersionIDs: versionIDs,
 	}
 	updated, err := client.UpdateWorkItem(id, item)
 	if err != nil {
@@ -196,15 +212,22 @@ func GetIteration(client *sdk.Client, id string) {
 	if err != nil {
 		log.Fatalf("Error getting iteration: %v", err)
 	}
-	fmt.Printf("Iteration: %s\nID: %s\nStart: %d\nEnd: %d\n", iter.Name, iter.ID, iter.StartDate, iter.EndDate)
+	fmt.Printf("Iteration: %s\nID: %s\nStart: %d\nEnd: %d\n", iter.Name, iter.ID, iter.StartAt, iter.EndAt)
 }
 
-func CreateIteration(client *sdk.Client, projectID, name, start, end string) {
+func CreateIteration(client *sdk.Client, projectID, name, start, end, assigneeID, desc, status string) {
 	if projectID == "" || name == "" {
 		log.Fatal("Project ID and Name are required")
 	}
-	// Parse dates if needed, but for now just pass as is or use current time
-	iter := &sdk.Iteration{ProjectID: projectID, Name: name}
+	iter := &sdk.Iteration{
+		ProjectID:   projectID,
+		Name:        name,
+		StartAt:     parseDateToMs(start),
+		EndAt:       parseDateToMs(end),
+		AssigneeID:  assigneeID,
+		Description: desc,
+		Status:      status,
+	}
 	created, err := client.CreateIteration(iter)
 	if err != nil {
 		log.Fatalf("Error creating iteration: %v", err)
@@ -212,11 +235,18 @@ func CreateIteration(client *sdk.Client, projectID, name, start, end string) {
 	fmt.Printf("Created Iteration: %s (ID: %s)\n", created.Name, created.ID)
 }
 
-func UpdateIteration(client *sdk.Client, id, name, start, end string) {
+func UpdateIteration(client *sdk.Client, id, name, start, end, assigneeID, desc, status string) {
 	if id == "" {
 		log.Fatal("Iteration ID is required")
 	}
-	iter := &sdk.Iteration{Name: name}
+	iter := &sdk.Iteration{
+		Name:        name,
+		StartAt:     parseDateToMs(start),
+		EndAt:       parseDateToMs(end),
+		AssigneeID:  assigneeID,
+		Description: desc,
+		Status:      status,
+	}
 	updated, err := client.UpdateIteration(id, iter)
 	if err != nil {
 		log.Fatalf("Error updating iteration: %v", err)
@@ -243,14 +273,21 @@ func GetVersion(client *sdk.Client, id string) {
 	if err != nil {
 		log.Fatalf("Error getting version: %v", err)
 	}
-	fmt.Printf("Version: %s\nID: %s\nRelease: %d\n", v.Name, v.ID, v.ReleaseDate)
+	fmt.Printf("Version: %s\nID: %s\nEndAt: %d\n", v.Name, v.ID, v.EndAt)
 }
 
-func CreateVersion(client *sdk.Client, projectID, name, start, release string) {
+func CreateVersion(client *sdk.Client, projectID, name, start, end, assigneeID, stageID string) {
 	if projectID == "" || name == "" {
 		log.Fatal("Project ID and Name are required")
 	}
-	v := &sdk.Version{ProjectID: projectID, Name: name}
+	v := &sdk.Version{
+		ProjectID:  projectID,
+		Name:       name,
+		StartAt:    parseDateToMs(start),
+		EndAt:      parseDateToMs(end),
+		AssigneeID: assigneeID,
+		StageID:    stageID,
+	}
 	created, err := client.CreateVersion(v)
 	if err != nil {
 		log.Fatalf("Error creating version: %v", err)
@@ -258,11 +295,17 @@ func CreateVersion(client *sdk.Client, projectID, name, start, release string) {
 	fmt.Printf("Created Version: %s (ID: %s)\n", created.Name, created.ID)
 }
 
-func UpdateVersion(client *sdk.Client, id, name, start, release string) {
+func UpdateVersion(client *sdk.Client, id, name, start, end, assigneeID, stageID string) {
 	if id == "" {
 		log.Fatal("Version ID is required")
 	}
-	v := &sdk.Version{Name: name}
+	v := &sdk.Version{
+		Name:       name,
+		StartAt:    parseDateToMs(start),
+		EndAt:      parseDateToMs(end),
+		AssigneeID: assigneeID,
+		StageID:    stageID,
+	}
 	updated, err := client.UpdateVersion(id, v)
 	if err != nil {
 		log.Fatalf("Error updating version: %v", err)

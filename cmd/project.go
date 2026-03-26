@@ -3,9 +3,25 @@ package cmd
 import (
 	"log"
 	"pingcode-client/internal/app/project"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
+
+// splitComma splits a comma-separated string into a slice, filtering empty strings.
+func splitComma(s string) []string {
+	if s == "" {
+		return nil
+	}
+	parts := strings.Split(s, ",")
+	out := make([]string, 0, len(parts))
+	for _, p := range parts {
+		if t := strings.TrimSpace(p); t != "" {
+			out = append(out, t)
+		}
+	}
+	return out
+}
 
 var projectCmd = &cobra.Command{
 	Use:   "project",
@@ -30,6 +46,7 @@ var (
 	startDate   string
 	endDate     string
 	releaseDate string
+	stageID     string
 	identifier  string
 	sprintID    string
 	boardID     string
@@ -39,6 +56,7 @@ var (
 	tagID       string
 	tagIDs      string
 	stateIDs    string
+	versionIDs  string
 )
 
 func init() {
@@ -138,6 +156,7 @@ func init() {
 	workitemCreateCmd.Flags().StringVar(&entryID, "entry-id", "", "Entry ID")
 	workitemCreateCmd.Flags().StringVar(&swimlaneID, "swimlane-id", "", "Swimlane ID")
 	workitemCreateCmd.Flags().StringVar(&parentID, "parent-id", "", "Parent WorkItem ID")
+	workitemCreateCmd.Flags().StringVar(&versionIDs, "version-ids", "", "Version IDs (comma separated)")
 	workitemCreateCmd.MarkFlagRequired("project-id")
 	workitemCreateCmd.MarkFlagRequired("title")
 	workitemCreateCmd.MarkFlagRequired("type-id")
@@ -153,6 +172,7 @@ func init() {
 	workitemUpdateCmd.Flags().StringVar(&entryID, "entry-id", "", "Entry ID")
 	workitemUpdateCmd.Flags().StringVar(&swimlaneID, "swimlane-id", "", "Swimlane ID")
 	workitemUpdateCmd.Flags().StringVar(&parentID, "parent-id", "", "Parent WorkItem ID")
+	workitemUpdateCmd.Flags().StringVar(&versionIDs, "version-ids", "", "Version IDs (comma separated)")
 	workitemUpdateCmd.MarkFlagRequired("id")
 
 	workitemDeleteCmd.Flags().StringVarP(&resourceID, "id", "i", "", "WorkItem ID")
@@ -179,6 +199,9 @@ func init() {
 	iterationCreateCmd.Flags().StringVarP(&name, "name", "n", "", "Name of the resource")
 	iterationCreateCmd.Flags().StringVar(&startDate, "start-date", "", "Start date (YYYY-MM-DD)")
 	iterationCreateCmd.Flags().StringVar(&endDate, "end-date", "", "End date (YYYY-MM-DD)")
+	iterationCreateCmd.Flags().StringVar(&assignee, "assignee-id", "", "Assignee user ID")
+	iterationCreateCmd.Flags().StringVarP(&desc, "desc", "d", "", "Description")
+	iterationCreateCmd.Flags().StringVar(&status, "status", "", "Iteration status")
 	iterationCreateCmd.MarkFlagRequired("project-id")
 	iterationCreateCmd.MarkFlagRequired("name")
 
@@ -186,6 +209,9 @@ func init() {
 	iterationUpdateCmd.Flags().StringVarP(&name, "name", "n", "", "Name of the resource")
 	iterationUpdateCmd.Flags().StringVar(&startDate, "start-date", "", "Start date (YYYY-MM-DD)")
 	iterationUpdateCmd.Flags().StringVar(&endDate, "end-date", "", "End date (YYYY-MM-DD)")
+	iterationUpdateCmd.Flags().StringVar(&assignee, "assignee-id", "", "Assignee user ID")
+	iterationUpdateCmd.Flags().StringVarP(&desc, "desc", "d", "", "Description")
+	iterationUpdateCmd.Flags().StringVar(&status, "status", "", "Iteration status")
 	iterationUpdateCmd.MarkFlagRequired("id")
 
 	iterationDeleteCmd.Flags().StringVarP(&resourceID, "id", "i", "", "Resource ID")
@@ -201,14 +227,18 @@ func init() {
 	versionCreateCmd.Flags().StringVarP(&projectID, "project-id", "p", "", "PingCode Project ID")
 	versionCreateCmd.Flags().StringVarP(&name, "name", "n", "", "Name of the resource")
 	versionCreateCmd.Flags().StringVar(&startDate, "start-date", "", "Start date (YYYY-MM-DD)")
-	versionCreateCmd.Flags().StringVar(&releaseDate, "release-date", "", "Release date (YYYY-MM-DD)")
+	versionCreateCmd.Flags().StringVar(&releaseDate, "end-date", "", "Release/end date (YYYY-MM-DD)")
+	versionCreateCmd.Flags().StringVar(&assignee, "assignee-id", "", "Assignee user ID")
+	versionCreateCmd.Flags().StringVar(&stageID, "stage-id", "", "Stage ID")
 	versionCreateCmd.MarkFlagRequired("project-id")
 	versionCreateCmd.MarkFlagRequired("name")
 
 	versionUpdateCmd.Flags().StringVarP(&resourceID, "id", "i", "", "Resource ID")
 	versionUpdateCmd.Flags().StringVarP(&name, "name", "n", "", "Name of the resource")
 	versionUpdateCmd.Flags().StringVar(&startDate, "start-date", "", "Start date (YYYY-MM-DD)")
-	versionUpdateCmd.Flags().StringVar(&releaseDate, "release-date", "", "Release date (YYYY-MM-DD)")
+	versionUpdateCmd.Flags().StringVar(&releaseDate, "end-date", "", "Release/end date (YYYY-MM-DD)")
+	versionUpdateCmd.Flags().StringVar(&assignee, "assignee-id", "", "Assignee user ID")
+	versionUpdateCmd.Flags().StringVar(&stageID, "stage-id", "", "Stage ID")
 	versionUpdateCmd.MarkFlagRequired("id")
 
 	versionDeleteCmd.Flags().StringVarP(&resourceID, "id", "i", "", "Resource ID")
@@ -352,7 +382,7 @@ var workitemCreateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.CreateWorkItem(c, projectID, title, desc, itemType, typeID, status, priority, assignee, sprintID, boardID, entryID, swimlaneID, parentID)
+		project.CreateWorkItem(c, projectID, title, desc, itemType, typeID, status, priority, assignee, sprintID, boardID, entryID, swimlaneID, parentID, splitComma(versionIDs))
 	},
 }
 var workitemUpdateCmd = &cobra.Command{
@@ -363,7 +393,7 @@ var workitemUpdateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.UpdateWorkItem(c, resourceID, title, desc, status, priority, assignee, sprintID, boardID, entryID, swimlaneID, parentID)
+		project.UpdateWorkItem(c, resourceID, title, desc, status, priority, assignee, sprintID, boardID, entryID, swimlaneID, parentID, splitComma(versionIDs))
 	},
 }
 var workitemDeleteCmd = &cobra.Command{
@@ -438,7 +468,7 @@ var iterationCreateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.CreateIteration(c, projectID, name, startDate, endDate)
+		project.CreateIteration(c, projectID, name, startDate, endDate, assignee, desc, status)
 	},
 }
 var iterationUpdateCmd = &cobra.Command{
@@ -449,7 +479,7 @@ var iterationUpdateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.UpdateIteration(c, resourceID, name, startDate, endDate)
+		project.UpdateIteration(c, resourceID, name, startDate, endDate, assignee, desc, status)
 	},
 }
 var iterationDeleteCmd = &cobra.Command{
@@ -495,7 +525,7 @@ var versionCreateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.CreateVersion(c, projectID, name, startDate, releaseDate)
+		project.CreateVersion(c, projectID, name, startDate, releaseDate, assignee, stageID)
 	},
 }
 var versionUpdateCmd = &cobra.Command{
@@ -506,7 +536,7 @@ var versionUpdateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.UpdateVersion(c, resourceID, name, startDate, releaseDate)
+		project.UpdateVersion(c, resourceID, name, startDate, releaseDate, assignee, stageID)
 	},
 }
 var versionDeleteCmd = &cobra.Command{

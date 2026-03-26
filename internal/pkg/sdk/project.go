@@ -16,19 +16,24 @@ type Project struct {
 }
 
 type Iteration struct {
-	ID        string `json:"id"`
-	Name      string `json:"name"`
-	ProjectID string `json:"project_id,omitempty"`
-	StartDate int64  `json:"start_date,omitempty"`
-	EndDate   int64  `json:"end_date,omitempty"`
-}
-
-type Version struct {
 	ID          string `json:"id"`
 	Name        string `json:"name"`
 	ProjectID   string `json:"project_id,omitempty"`
-	StartDate   int64  `json:"start_date,omitempty"`
-	ReleaseDate int64  `json:"release_date,omitempty"`
+	StartAt     int64  `json:"start_at,omitempty"`
+	EndAt       int64  `json:"end_at,omitempty"`
+	AssigneeID  string `json:"assignee_id,omitempty"`
+	Description string `json:"description,omitempty"`
+	Status      string `json:"status,omitempty"`
+}
+
+type Version struct {
+	ID         string `json:"id"`
+	Name       string `json:"name"`
+	ProjectID  string `json:"project_id,omitempty"`
+	StartAt    int64  `json:"start_at,omitempty"`
+	EndAt      int64  `json:"end_at,omitempty"`
+	AssigneeID string `json:"assignee_id,omitempty"`
+	StageID    string `json:"stage_id,omitempty"`
 }
 
 type Kanban struct {
