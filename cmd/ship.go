@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"log"
 	"pingcode-client/internal/app/ship"
 	"pingcode-client/internal/pkg/sdk"
 
@@ -40,6 +41,13 @@ var (
 	pTagID       string
 	pParentID    string
 	pSuiteType   string
+
+	// Ticket specific flags
+	ticketID   string
+	solutionID string
+	customerID string
+	channelID  string
+	keywords   string
 )
 
 var productCmd = &cobra.Command{
@@ -460,4 +468,120 @@ func init() {
 	updateIdeaCmd.Flags().StringVar(&assigneeID, "assignee-id", "", "负责人 ID")
 	updateIdeaCmd.Flags().StringVar(&suiteID, "suite-id", "", "模块 ID")
 	updateIdeaCmd.Flags().StringVar(&planID, "plan-id", "", "排期 ID")
+
+	// Ticket commands
+	shipCmd.AddCommand(ticketsCmd)
+	ticketsCmd.AddCommand(listTicketsCmd)
+	ticketsCmd.AddCommand(getTicketCmd)
+	ticketsCmd.AddCommand(createTicketCmd)
+	ticketsCmd.AddCommand(updateTicketCmd)
+	ticketsCmd.AddCommand(listTicketPrioritiesCmd)
+	ticketsCmd.AddCommand(listTicketStatesCmd)
+
+	ticketsCmd.PersistentFlags().StringVar(&productID, "product-id", "", "产品 ID")
+
+	listTicketsCmd.Flags().StringVar(&typeID, "type-id", "", "工单类型 ID")
+	listTicketsCmd.Flags().StringVar(&stateID, "state-id", "", "工单状态 ID")
+	listTicketsCmd.Flags().StringVar(&priorityID, "priority-id", "", "工单优先级 ID")
+	listTicketsCmd.Flags().StringVar(&keywords, "keywords", "", "关键字搜索")
+
+	getTicketCmd.Flags().StringVar(&ticketID, "id", "", "工单 ID")
+	getTicketCmd.MarkFlagRequired("id")
+
+	createTicketCmd.Flags().StringVar(&title, "title", "", "工单标题")
+	createTicketCmd.Flags().StringVar(&desc, "desc", "", "工单描述")
+	createTicketCmd.Flags().StringVar(&typeID, "type-id", "", "工单类型 ID")
+	createTicketCmd.Flags().StringVar(&assigneeID, "assignee-id", "", "负责人 ID")
+	createTicketCmd.Flags().StringVar(&priorityID, "priority-id", "", "优先级 ID")
+	createTicketCmd.Flags().StringVar(&channelID, "channel-id", "", "渠道 ID")
+	createTicketCmd.Flags().StringVar(&customerID, "customer-id", "", "客户 ID")
+	createTicketCmd.MarkFlagRequired("title")
+	createTicketCmd.MarkFlagRequired("type-id")
+
+	updateTicketCmd.Flags().StringVar(&ticketID, "id", "", "工单 ID")
+	updateTicketCmd.Flags().StringVar(&title, "title", "", "工单标题")
+	updateTicketCmd.Flags().StringVar(&desc, "desc", "", "工单描述")
+	updateTicketCmd.Flags().StringVar(&typeID, "type-id", "", "工单类型 ID")
+	updateTicketCmd.Flags().StringVar(&stateID, "state-id", "", "工单状态 ID")
+	updateTicketCmd.Flags().StringVar(&assigneeID, "assignee-id", "", "负责人 ID")
+	updateTicketCmd.Flags().StringVar(&priorityID, "priority-id", "", "优先级 ID")
+	updateTicketCmd.Flags().StringVar(&solutionID, "solution-id", "", "解决方案 ID")
+	updateTicketCmd.Flags().StringVar(&customerID, "customer-id", "", "客户 ID")
+	updateTicketCmd.MarkFlagRequired("id")
+}
+
+// ── Ticket commands ────────────────────────────────────────────────────────
+
+var ticketsCmd = &cobra.Command{Use: "tickets", Short: "工单管理"}
+
+var listTicketsCmd = &cobra.Command{
+Use:   "list",
+Short: "获取工单列表",
+Run: func(cmd *cobra.Command, args []string) {
+client, err := GetClient()
+if err != nil {
+log.Fatal(err)
+}
+ship.ListTickets(client, productID, typeID, stateID, priorityID, keywords)
+},
+}
+
+var getTicketCmd = &cobra.Command{
+Use:   "get",
+Short: "获取工单详情",
+Run: func(cmd *cobra.Command, args []string) {
+client, err := GetClient()
+if err != nil {
+log.Fatal(err)
+}
+ship.GetTicket(client, ticketID)
+},
+}
+
+var createTicketCmd = &cobra.Command{
+Use:   "create",
+Short: "创建工单",
+Run: func(cmd *cobra.Command, args []string) {
+client, err := GetClient()
+if err != nil {
+log.Fatal(err)
+}
+ship.CreateTicket(client, productID, title, desc, typeID, assigneeID, priorityID, channelID, customerID)
+},
+}
+
+var updateTicketCmd = &cobra.Command{
+Use:   "update",
+Short: "更新工单",
+Run: func(cmd *cobra.Command, args []string) {
+client, err := GetClient()
+if err != nil {
+log.Fatal(err)
+}
+ship.UpdateTicket(client, ticketID, title, desc, typeID, stateID, assigneeID, priorityID, solutionID, customerID)
+},
+}
+
+var listTicketPrioritiesCmd = &cobra.Command{
+Use:   "priorities",
+Short: "获取工单优先级列表",
+Run: func(cmd *cobra.Command, args []string) {
+client, err := GetClient()
+if err != nil {
+log.Fatal(err)
+}
+ship.ListTicketPriorities(client, productID)
+},
+}
+
+var listTicketStatesCmd = &cobra.Command{
+Use:   "states",
+Short: "获取工单状态列表",
+Run: func(cmd *cobra.Command, args []string) {
+client, err := GetClient()
+if err != nil {
+log.Fatal(err)
+}
+ship.ListTicketStates(client, productID)
+},
 }

@@ -276,3 +276,80 @@ func Help(cmd *cobra.Command, args []string) {
 	// ctx := cmd.Context()
 	cmd.Help()
 }
+
+// ── Ticket ────────────────────────────────────────────────────────────────
+
+func ListTickets(client *sdk.Client, productID, typeID, stateID, priorityID, keywords string) {
+	tickets, err := client.ListTickets(productID, typeID, stateID, priorityID, keywords)
+	if err != nil {
+		log.Fatalf("Error listing tickets: %v", err)
+	}
+	fmt.Println("Tickets:")
+	for _, t := range tickets {
+		fmt.Printf("- [%s] %s (ID: %s)\n", t.Identifier, t.Title, t.ID)
+	}
+}
+
+func GetTicket(client *sdk.Client, ticketID string) {
+	t, err := client.GetTicket(ticketID)
+	if err != nil {
+		log.Fatalf("Error getting ticket: %v", err)
+	}
+	fmt.Printf("Ticket: %s\nID: %s\nIdentifier: %s\nTitle: %s\n", t.ID, t.ID, t.Identifier, t.Title)
+}
+
+func CreateTicket(client *sdk.Client, productID, title, desc, typeID, assigneeID, priorityID, channelID, customerID string) {
+	t, err := client.CreateTicket(&sdk.Ticket{
+		ProductID:   productID,
+		Title:       title,
+		Description: desc,
+		TypeID:      typeID,
+		AssigneeID:  assigneeID,
+		PriorityID:  priorityID,
+		ChannelID:   channelID,
+		CustomerID:  customerID,
+	})
+	if err != nil {
+		log.Fatalf("Error creating ticket: %v", err)
+	}
+	fmt.Printf("Created Ticket: %s (ID: %s)\n", t.Identifier, t.ID)
+}
+
+func UpdateTicket(client *sdk.Client, ticketID, title, desc, typeID, stateID, assigneeID, priorityID, solutionID, customerID string) {
+	t, err := client.UpdateTicket(ticketID, &sdk.Ticket{
+		Title:       title,
+		Description: desc,
+		TypeID:      typeID,
+		StateID:     stateID,
+		AssigneeID:  assigneeID,
+		PriorityID:  priorityID,
+		SolutionID:  solutionID,
+		CustomerID:  customerID,
+	})
+	if err != nil {
+		log.Fatalf("Error updating ticket: %v", err)
+	}
+	fmt.Printf("Updated Ticket: %s (ID: %s)\n", t.Identifier, t.ID)
+}
+
+func ListTicketPriorities(client *sdk.Client, productID string) {
+	priorities, err := client.ListTicketPriorities(productID)
+	if err != nil {
+		log.Fatalf("Error listing ticket priorities: %v", err)
+	}
+	fmt.Println("Ticket Priorities:")
+	for _, p := range priorities {
+		fmt.Printf("- %s (ID: %s)\n", p.Name, p.ID)
+	}
+}
+
+func ListTicketStates(client *sdk.Client, productID string) {
+	states, err := client.ListTicketStates(productID)
+	if err != nil {
+		log.Fatalf("Error listing ticket states: %v", err)
+	}
+	fmt.Println("Ticket States:")
+	for _, s := range states {
+		fmt.Printf("- %s [%s] (ID: %s)\n", s.Name, s.Type, s.ID)
+	}
+}

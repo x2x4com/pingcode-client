@@ -627,3 +627,165 @@ func (c *Client) ListIdeaTransitionHistories(ideaID string) ([]IdeaTransitionHis
 
 	return listResp.Values, nil
 }
+
+// ── Ticket ────────────────────────────────────────────────────────────────
+
+type Ticket struct {
+ID          string `json:"id,omitempty"`
+Identifier  string `json:"identifier,omitempty"`
+Title       string `json:"title,omitempty"`
+Description string `json:"description,omitempty"`
+ProductID   string `json:"product_id,omitempty"`
+TypeID      string `json:"type_id,omitempty"`
+StateID     string `json:"state_id,omitempty"`
+AssigneeID  string `json:"assignee_id,omitempty"`
+PriorityID  string `json:"priority_id,omitempty"`
+ChannelID   string `json:"channel_id,omitempty"`
+CustomerID  string `json:"customer_id,omitempty"`
+SolutionID  string `json:"solution_id,omitempty"`
+SubmitterID string `json:"submitter_id,omitempty"`
+}
+
+type TicketListResponse struct {
+Values    []Ticket `json:"values"`
+Total     int      `json:"total"`
+PageSize  int      `json:"page_size"`
+PageIndex int      `json:"page_index"`
+}
+
+type TicketPriority struct {
+ID   string `json:"id"`
+Name string `json:"name"`
+}
+
+type TicketPriorityListResponse struct {
+Values    []TicketPriority `json:"values"`
+Total     int              `json:"total"`
+PageSize  int              `json:"page_size"`
+PageIndex int              `json:"page_index"`
+}
+
+type TicketState struct {
+ID   string `json:"id"`
+Name string `json:"name"`
+Type string `json:"type"`
+}
+
+type TicketStateListResponse struct {
+Values    []TicketState `json:"values"`
+Total     int           `json:"total"`
+PageSize  int           `json:"page_size"`
+PageIndex int           `json:"page_index"`
+}
+
+func (c *Client) ListTickets(productID, typeID, stateID, priorityID, keywords string) ([]Ticket, error) {
+path := "/ship/tickets?"
+if productID != "" {
+path += "product_id=" + productID + "&"
+}
+if typeID != "" {
+path += "type_id=" + typeID + "&"
+}
+if stateID != "" {
+path += "state_id=" + stateID + "&"
+}
+if priorityID != "" {
+path += "priority_id=" + priorityID + "&"
+}
+if keywords != "" {
+path += "keywords=" + keywords + "&"
+}
+resp, err := c.Request("GET", path, nil)
+if err != nil {
+return nil, err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK {
+return nil, fmt.Errorf("list tickets failed with status: %d", resp.StatusCode)
+}
+var listResp TicketListResponse
+if err := json.NewDecoder(resp.Body).Decode(&listResp); err != nil {
+return nil, err
+}
+return listResp.Values, nil
+}
+
+func (c *Client) GetTicket(ticketID string) (*Ticket, error) {
+resp, err := c.Request("GET", fmt.Sprintf("/ship/tickets/%s", ticketID), nil)
+if err != nil {
+return nil, err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK {
+return nil, fmt.Errorf("get ticket failed with status: %d", resp.StatusCode)
+}
+var t Ticket
+if err := json.NewDecoder(resp.Body).Decode(&t); err != nil {
+return nil, err
+}
+return &t, nil
+}
+
+func (c *Client) CreateTicket(t *Ticket) (*Ticket, error) {
+resp, err := c.Request("POST", "/ship/tickets", t)
+if err != nil {
+return nil, err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+return nil, fmt.Errorf("create ticket failed with status: %d", resp.StatusCode)
+}
+var created Ticket
+if err := json.NewDecoder(resp.Body).Decode(&created); err != nil {
+return nil, err
+}
+return &created, nil
+}
+
+func (c *Client) UpdateTicket(ticketID string, t *Ticket) (*Ticket, error) {
+resp, err := c.Request("PATCH", fmt.Sprintf("/ship/tickets/%s", ticketID), t)
+if err != nil {
+return nil, err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK {
+return nil, fmt.Errorf("update ticket failed with status: %d", resp.StatusCode)
+}
+var updated Ticket
+if err := json.NewDecoder(resp.Body).Decode(&updated); err != nil {
+return nil, err
+}
+return &updated, nil
+}
+
+func (c *Client) ListTicketPriorities(productID string) ([]TicketPriority, error) {
+resp, err := c.Request("GET", fmt.Sprintf("/ship/ticket/priorities?product_id=%s", productID), nil)
+if err != nil {
+return nil, err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK {
+return nil, fmt.Errorf("list ticket priorities failed with status: %d", resp.StatusCode)
+}
+var listResp TicketPriorityListResponse
+if err := json.NewDecoder(resp.Body).Decode(&listResp); err != nil {
+return nil, err
+}
+return listResp.Values, nil
+}
+
+func (c *Client) ListTicketStates(productID string) ([]TicketState, error) {
+resp, err := c.Request("GET", fmt.Sprintf("/ship/ticket/states?product_id=%s", productID), nil)
+if err != nil {
+return nil, err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK {
+return nil, fmt.Errorf("list ticket states failed with status: %d", resp.StatusCode)
+}
+var listResp TicketStateListResponse
+if err := json.NewDecoder(resp.Body).Decode(&listResp); err != nil {
+return nil, err
+}
+return listResp.Values, nil
+}
