@@ -96,3 +96,50 @@ pingcode-client ship ideas histories --idea-id {idea_id}
 
 *   **模块区分**: 始终记住 `ship` 是顶层模块，`product` 用于配置和管理产品本身，而 `ideas` 用于管理产品下的具体需求。
 *   **ID 必填**: 绝大多数子命令都需要 `--product-id`，请先通过 `pingcode-client ship product list` 获取。
+
+---
+
+## 5. 工单管理 (Tickets)
+
+工单模块用于管理来自客户的问题反馈和功能请求。
+
+### 5.1 ID 速查
+| 资源类型 | 获取命令 | 备注 |
+| :--- | :--- | :--- |
+| **工单优先级** | `pingcode-client ship tickets priorities --product-id {pid}` | 获取优先级 ID |
+| **工单状态** | `pingcode-client ship tickets states --product-id {pid}` | 获取状态 ID |
+| **工单类型** | `pingcode-client ship product ticket-types --product-id {pid}` | 获取工单类型 ID |
+| **渠道列表** | `pingcode-client ship product channels --product-id {pid}` | 获取渠道 ID |
+
+### 5.2 工单基础操作
+- **列出工单**:
+  ```bash
+  pingcode-client ship tickets list --product-id {pid}
+  # 按状态筛选
+  pingcode-client ship tickets list --product-id {pid} --state-id {sid}
+  # 关键字搜索
+  pingcode-client ship tickets list --product-id {pid} --keywords "登录"
+  ```
+- **获取工单详情**:
+  ```bash
+  pingcode-client ship tickets get --id {ticket_id}
+  ```
+- **创建工单**:
+  ```bash
+  pingcode-client ship tickets create \
+    --product-id {pid} \
+    --title "用户无法登录" \
+    --type-id {type_id} \
+    --assignee-id {user_id} \
+    --priority-id {priority_id} \
+    --channel-id {channel_id}
+  ```
+- **更新工单**:
+  ```bash
+  # 更新状态
+  pingcode-client ship tickets update --id {ticket_id} --state-id {new_state_id}
+  # 更改负责人
+  pingcode-client ship tickets update --id {ticket_id} --assignee-id {user_id}
+  # 设置解决方案
+  pingcode-client ship tickets update --id {ticket_id} --solution-id {solution_id}
+  ```

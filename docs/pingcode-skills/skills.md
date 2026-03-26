@@ -1,7 +1,12 @@
 # PingCode 工作流管理指南 (CLI)
 
 ## 边界
-当前这个版本的 PingCode 工作流管理指南，是实现了对产品模块和开发流程的管理
+当前这个版本的 PingCode 工作流管理指南，覆盖以下模块：
+- **产品管理 (Ship)**: 产品、需求、工单
+- **项目管理 (Project)**: 项目、工作项、迭代、版本、看板、成员
+- **知识管理 (Wiki)**: 空间、页面、内容
+- **测试管理 (TestHub)**: 测试库、用例、计划、执行
+- **企业组织 (Directory)**: 企业成员、部门
 
 ## 工具
 
@@ -40,6 +45,17 @@ export PINGCODE_CLIENT_SECRET=<your_client_secret>
 ```
 
 > Client ID 和 Secret 可在 PingCode 管理后台 → **开发者设置** → **OAuth 应用** 中创建获取。
+
+### 参考文档索引
+
+| 模块 | 参考文档 | 说明 |
+| ---- | -------- | ---- |
+| 产品/需求/工单 | `references/ship_guide.md` | Ship 模块完整操作手册 |
+| 项目/工作项 | `references/workitem_guide.md` | 工作项 CRUD、标签、关联 |
+| 迭代/版本/看板 | `references/project_guide.md` | 迭代、版本、看板操作 |
+| 知识管理 | `references/wiki_guide.md` | Wiki 空间和页面管理 |
+| 测试管理 | `references/testhub_guide.md` | 测试库、用例、计划、执行 |
+| 企业组织 | `references/directory_guide.md` | 成员和部门管理 |
 
 ## 角色
 
@@ -253,6 +269,7 @@ pingcode-client project workitem update \
 | 2 | 领取测试任务：将状态更新为"测试中" | 参考 `references/workitem_guide.md` 更新工作项状态 |
 | 3 | 测试通过：将工作项状态更新为"已完成" | 参考 `references/workitem_guide.md` 更新工作项状态 |
 | 4 | 测试不通过：退回工作项，在描述中记录缺陷复现步骤，打 `qa` 标签标记 | 参考 `references/workitem_guide.md` 更新工作项状态 |
+| 5 | （可选）在 TestHub 创建/执行测试用例，关联到测试计划 | 参考 `references/testhub_guide.md` |
 
 Example
 ```bash
@@ -283,6 +300,11 @@ pingcode-client project workitem update \
 # 为退回的工作项打 qa 标签方便追踪
 pingcode-client project metadata tags list
 pingcode-client project workitem tag add -i {work_item_id} -t {qa_tag_id}
+
+# （可选）在 TestHub 中记录测试执行
+pingcode-client testhub library list
+pingcode-client testhub case list --library-id {lib_id}
+pingcode-client testhub run create --library-id {lid} --plan-id {pid} --case-id {cid} --executor-id {user_id}
 ```
 
 ### DevOps
