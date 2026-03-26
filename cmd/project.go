@@ -57,9 +57,17 @@ var (
 	tagIDs      string
 	stateIDs    string
 	versionIDs  string
-	wipLimit    int
-	isSplit     bool
-	dod         string
+	wipLimit      int
+	isSplit       bool
+	dod           string
+	memberID      string
+	memberType    string
+	roleID        string
+	targetID      string
+	relType       string
+	participantID string
+	relationID    string
+	userID        string
 )
 
 func init() {
@@ -132,6 +140,28 @@ func init() {
 	tagsCmd.AddCommand(tagsCreateCmd)
 	metadataCmd.AddCommand(propertiesCmd)
 	metadataCmd.AddCommand(membersCmd)
+
+	// member subcommands (project member CRUD)
+	projectCmd.AddCommand(memberCmd)
+	memberCmd.AddCommand(memberListCmd)
+	memberCmd.AddCommand(memberAddCmd)
+	memberCmd.AddCommand(memberRemoveCmd)
+	memberCmd.AddCommand(memberUpdateCmd)
+
+	// workitem participant subcommands
+	workitemCmd.AddCommand(participantCmd)
+	participantCmd.AddCommand(participantListCmd)
+	participantCmd.AddCommand(participantAddCmd)
+	participantCmd.AddCommand(participantRemoveCmd)
+
+	// workitem relation subcommands
+	workitemCmd.AddCommand(relationCmd)
+	relationCmd.AddCommand(relationListCmd)
+	relationCmd.AddCommand(relationAddCmd)
+	relationCmd.AddCommand(relationRemoveCmd)
+
+	// workitem transition history
+	workitemCmd.AddCommand(workitemHistoriesCmd)
 
 	// Project
 	projectGetCmd.Flags().StringVarP(&resourceID, "id", "i", "", "Resource ID")
@@ -358,6 +388,64 @@ func init() {
 
 	membersCmd.Flags().StringVarP(&projectID, "project-id", "p", "", "PingCode Project ID")
 	membersCmd.MarkFlagRequired("project-id")
+
+	// Member CRUD flags
+	memberListCmd.Flags().StringVarP(&projectID, "project-id", "p", "", "PingCode Project ID")
+	memberListCmd.MarkFlagRequired("project-id")
+
+	memberAddCmd.Flags().StringVarP(&projectID, "project-id", "p", "", "PingCode Project ID")
+	memberAddCmd.Flags().StringVar(&memberID, "member-id", "", "Member ID")
+	memberAddCmd.Flags().StringVar(&memberType, "member-type", "", "Member type (e.g. user)")
+	memberAddCmd.Flags().StringVar(&roleID, "role-id", "", "Role ID (optional)")
+	memberAddCmd.MarkFlagRequired("project-id")
+	memberAddCmd.MarkFlagRequired("member-id")
+	memberAddCmd.MarkFlagRequired("member-type")
+
+	memberRemoveCmd.Flags().StringVarP(&projectID, "project-id", "p", "", "PingCode Project ID")
+	memberRemoveCmd.Flags().StringVar(&memberID, "member-id", "", "Member ID")
+	memberRemoveCmd.MarkFlagRequired("project-id")
+	memberRemoveCmd.MarkFlagRequired("member-id")
+
+	memberUpdateCmd.Flags().StringVarP(&projectID, "project-id", "p", "", "PingCode Project ID")
+	memberUpdateCmd.Flags().StringVar(&memberID, "member-id", "", "Member ID")
+	memberUpdateCmd.Flags().StringVar(&roleID, "role-id", "", "New Role ID")
+	memberUpdateCmd.MarkFlagRequired("project-id")
+	memberUpdateCmd.MarkFlagRequired("member-id")
+	memberUpdateCmd.MarkFlagRequired("role-id")
+
+	// Participant flags
+	participantListCmd.Flags().StringVarP(&resourceID, "id", "i", "", "WorkItem ID")
+	participantListCmd.MarkFlagRequired("id")
+
+	participantAddCmd.Flags().StringVarP(&resourceID, "id", "i", "", "WorkItem ID")
+	participantAddCmd.Flags().StringVar(&userID, "user-id", "", "User ID to add as participant")
+	participantAddCmd.MarkFlagRequired("id")
+	participantAddCmd.MarkFlagRequired("user-id")
+
+	participantRemoveCmd.Flags().StringVarP(&resourceID, "id", "i", "", "WorkItem ID")
+	participantRemoveCmd.Flags().StringVar(&participantID, "participant-id", "", "Participant ID to remove")
+	participantRemoveCmd.MarkFlagRequired("id")
+	participantRemoveCmd.MarkFlagRequired("participant-id")
+
+	// Relation flags
+	relationListCmd.Flags().StringVarP(&resourceID, "id", "i", "", "WorkItem ID")
+	relationListCmd.MarkFlagRequired("id")
+
+	relationAddCmd.Flags().StringVarP(&resourceID, "id", "i", "", "WorkItem ID")
+	relationAddCmd.Flags().StringVar(&targetID, "target-id", "", "Target WorkItem ID")
+	relationAddCmd.Flags().StringVar(&relType, "type", "", "Relation type")
+	relationAddCmd.MarkFlagRequired("id")
+	relationAddCmd.MarkFlagRequired("target-id")
+	relationAddCmd.MarkFlagRequired("type")
+
+	relationRemoveCmd.Flags().StringVarP(&resourceID, "id", "i", "", "WorkItem ID")
+	relationRemoveCmd.Flags().StringVar(&relationID, "relation-id", "", "Relation ID to remove")
+	relationRemoveCmd.MarkFlagRequired("id")
+	relationRemoveCmd.MarkFlagRequired("relation-id")
+
+	// Transition history flags
+	workitemHistoriesCmd.Flags().StringVarP(&resourceID, "id", "i", "", "WorkItem ID")
+	workitemHistoriesCmd.MarkFlagRequired("id")
 }
 
 // Resource Commands
@@ -881,5 +969,151 @@ if err != nil {
 log.Fatal(err)
 }
 project.DeleteKanbanEntry(c, projectID, boardID, resourceID)
+},
+}
+
+// ── Member commands ────────────────────────────────────────────────────────
+
+var memberCmd = &cobra.Command{Use: "member", Short: "项目成员管理"}
+
+var memberListCmd = &cobra.Command{
+Use:   "list",
+Short: "列出项目成员",
+Run: func(cmd *cobra.Command, args []string) {
+c, err := GetClient()
+if err != nil {
+log.Fatal(err)
+}
+project.ListProjectMembers(c, projectID)
+},
+}
+
+var memberAddCmd = &cobra.Command{
+Use:   "add",
+Short: "添加项目成员",
+Run: func(cmd *cobra.Command, args []string) {
+c, err := GetClient()
+if err != nil {
+log.Fatal(err)
+}
+project.AddProjectMember(c, projectID, memberID, memberType, roleID)
+},
+}
+
+var memberRemoveCmd = &cobra.Command{
+Use:   "remove",
+Short: "移除项目成员",
+Run: func(cmd *cobra.Command, args []string) {
+c, err := GetClient()
+if err != nil {
+log.Fatal(err)
+}
+project.RemoveProjectMember(c, projectID, memberID)
+},
+}
+
+var memberUpdateCmd = &cobra.Command{
+Use:   "update",
+Short: "更新项目成员角色",
+Run: func(cmd *cobra.Command, args []string) {
+c, err := GetClient()
+if err != nil {
+log.Fatal(err)
+}
+project.UpdateProjectMember(c, projectID, memberID, roleID)
+},
+}
+
+// ── WorkItem Participant commands ──────────────────────────────────────────
+
+var participantCmd = &cobra.Command{Use: "participant", Short: "工作项参与者管理"}
+
+var participantListCmd = &cobra.Command{
+Use:   "list",
+Short: "列出工作项参与者",
+Run: func(cmd *cobra.Command, args []string) {
+c, err := GetClient()
+if err != nil {
+log.Fatal(err)
+}
+project.ListWorkItemParticipants(c, resourceID)
+},
+}
+
+var participantAddCmd = &cobra.Command{
+Use:   "add",
+Short: "添加工作项参与者",
+Run: func(cmd *cobra.Command, args []string) {
+c, err := GetClient()
+if err != nil {
+log.Fatal(err)
+}
+project.AddWorkItemParticipant(c, resourceID, userID)
+},
+}
+
+var participantRemoveCmd = &cobra.Command{
+Use:   "remove",
+Short: "移除工作项参与者",
+Run: func(cmd *cobra.Command, args []string) {
+c, err := GetClient()
+if err != nil {
+log.Fatal(err)
+}
+project.RemoveWorkItemParticipant(c, resourceID, participantID)
+},
+}
+
+// ── WorkItem Relation commands ─────────────────────────────────────────────
+
+var relationCmd = &cobra.Command{Use: "relation", Short: "工作项关联管理"}
+
+var relationListCmd = &cobra.Command{
+Use:   "list",
+Short: "列出工作项关联",
+Run: func(cmd *cobra.Command, args []string) {
+c, err := GetClient()
+if err != nil {
+log.Fatal(err)
+}
+project.ListWorkItemRelations(c, resourceID)
+},
+}
+
+var relationAddCmd = &cobra.Command{
+Use:   "add",
+Short: "添加工作项关联",
+Run: func(cmd *cobra.Command, args []string) {
+c, err := GetClient()
+if err != nil {
+log.Fatal(err)
+}
+project.AddWorkItemRelation(c, resourceID, targetID, relType)
+},
+}
+
+var relationRemoveCmd = &cobra.Command{
+Use:   "remove",
+Short: "移除工作项关联",
+Run: func(cmd *cobra.Command, args []string) {
+c, err := GetClient()
+if err != nil {
+log.Fatal(err)
+}
+project.RemoveWorkItemRelation(c, resourceID, relationID)
+},
+}
+
+// ── WorkItem Transition History ────────────────────────────────────────────
+
+var workitemHistoriesCmd = &cobra.Command{
+Use:   "histories",
+Short: "列出工作项状态变更历史",
+Run: func(cmd *cobra.Command, args []string) {
+c, err := GetClient()
+if err != nil {
+log.Fatal(err)
+}
+project.ListWorkItemTransitionHistories(c, resourceID)
 },
 }

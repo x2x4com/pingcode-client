@@ -638,6 +638,140 @@ func DeleteKanbanEntry(client *sdk.Client, projectID, boardID, entryID string) {
 	fmt.Printf("Deleted entry %s\n", entryID)
 }
 
+// ── Project Member CRUD ────────────────────────────────────────────────────
+
+func AddProjectMember(client *sdk.Client, projectID, memberID, memberType, roleID string) {
+	if projectID == "" || memberID == "" || memberType == "" {
+		log.Fatal("Project ID, Member ID, and Member Type are required")
+	}
+	m, err := client.AddProjectMember(projectID, memberID, memberType, roleID)
+	if err != nil {
+		log.Fatalf("Error adding project member: %v", err)
+	}
+	fmt.Printf("Added Member: %s (ID: %s)\n", memberID, m.ID)
+}
+
+func RemoveProjectMember(client *sdk.Client, projectID, memberID string) {
+	if projectID == "" || memberID == "" {
+		log.Fatal("Project ID and Member ID are required")
+	}
+	err := client.RemoveProjectMember(projectID, memberID)
+	if err != nil {
+		log.Fatalf("Error removing project member: %v", err)
+	}
+	fmt.Printf("Removed Member %s from Project %s\n", memberID, projectID)
+}
+
+func UpdateProjectMember(client *sdk.Client, projectID, memberID, roleID string) {
+	if projectID == "" || memberID == "" {
+		log.Fatal("Project ID and Member ID are required")
+	}
+	m, err := client.UpdateProjectMember(projectID, memberID, roleID)
+	if err != nil {
+		log.Fatalf("Error updating project member: %v", err)
+	}
+	fmt.Printf("Updated Member %s (ID: %s)\n", memberID, m.ID)
+}
+
+// ── WorkItem Participant ───────────────────────────────────────────────────
+
+func ListWorkItemParticipants(client *sdk.Client, workItemID string) {
+	if workItemID == "" {
+		log.Fatal("WorkItem ID is required")
+	}
+	participants, err := client.ListWorkItemParticipants(workItemID)
+	if err != nil {
+		log.Fatalf("Error listing work item participants: %v", err)
+	}
+	fmt.Println("Participants:")
+	for _, p := range participants {
+		fmt.Printf("- ID: %s (Type: %s)\n", p.ID, p.Type)
+	}
+}
+
+func AddWorkItemParticipant(client *sdk.Client, workItemID, userID string) {
+	if workItemID == "" || userID == "" {
+		log.Fatal("WorkItem ID and User ID are required")
+	}
+	p, err := client.AddWorkItemParticipant(workItemID, userID)
+	if err != nil {
+		log.Fatalf("Error adding work item participant: %v", err)
+	}
+	fmt.Printf("Added Participant: %s (Type: %s)\n", p.ID, p.Type)
+}
+
+func RemoveWorkItemParticipant(client *sdk.Client, workItemID, participantID string) {
+	if workItemID == "" || participantID == "" {
+		log.Fatal("WorkItem ID and Participant ID are required")
+	}
+	err := client.RemoveWorkItemParticipant(workItemID, participantID)
+	if err != nil {
+		log.Fatalf("Error removing work item participant: %v", err)
+	}
+	fmt.Printf("Removed Participant %s from WorkItem %s\n", participantID, workItemID)
+}
+
+// ── WorkItem Relation ──────────────────────────────────────────────────────
+
+func ListWorkItemRelations(client *sdk.Client, workItemID string) {
+	if workItemID == "" {
+		log.Fatal("WorkItem ID is required")
+	}
+	relations, err := client.ListWorkItemRelations(workItemID)
+	if err != nil {
+		log.Fatalf("Error listing work item relations: %v", err)
+	}
+	fmt.Println("Relations:")
+	for _, r := range relations {
+		fmt.Printf("- ID: %s (Type: %s)\n", r.ID, r.RelationType)
+	}
+}
+
+func AddWorkItemRelation(client *sdk.Client, workItemID, targetID, relationType string) {
+	if workItemID == "" || targetID == "" || relationType == "" {
+		log.Fatal("WorkItem ID, Target ID, and Relation Type are required")
+	}
+	r, err := client.AddWorkItemRelation(workItemID, targetID, relationType)
+	if err != nil {
+		log.Fatalf("Error adding work item relation: %v", err)
+	}
+	fmt.Printf("Added Relation: %s (Type: %s)\n", r.ID, r.RelationType)
+}
+
+func RemoveWorkItemRelation(client *sdk.Client, workItemID, relationID string) {
+	if workItemID == "" || relationID == "" {
+		log.Fatal("WorkItem ID and Relation ID are required")
+	}
+	err := client.RemoveWorkItemRelation(workItemID, relationID)
+	if err != nil {
+		log.Fatalf("Error removing work item relation: %v", err)
+	}
+	fmt.Printf("Removed Relation %s from WorkItem %s\n", relationID, workItemID)
+}
+
+// ── WorkItem Transition History ────────────────────────────────────────────
+
+func ListWorkItemTransitionHistories(client *sdk.Client, workItemID string) {
+	if workItemID == "" {
+		log.Fatal("WorkItem ID is required")
+	}
+	histories, err := client.ListWorkItemTransitionHistories(workItemID)
+	if err != nil {
+		log.Fatalf("Error listing work item transition histories: %v", err)
+	}
+	fmt.Println("Transition Histories:")
+	for _, h := range histories {
+		from, to := "", ""
+		if h.FromState != nil {
+			from = h.FromState.Name
+		}
+		if h.ToState != nil {
+			to = h.ToState.Name
+		}
+		fmt.Printf("- ID: %s  %s → %s  (at: %d)\n", h.ID, from, to, h.CreatedAt)
+	}
+}
+
 func Help(cmd *cobra.Command, args []string) {
 	// ctx := cmd.Context()
 	cmd.Help()

@@ -1053,3 +1053,211 @@ return fmt.Errorf("delete kanban entry failed with status: %d", resp.StatusCode)
 }
 return nil
 }
+
+// ── Project Member CRUD ────────────────────────────────────────────────────
+
+func (c *Client) AddProjectMember(projectID, memberID, memberType, roleID string) (*ProjectMember, error) {
+member := map[string]interface{}{
+"id":   memberID,
+"type": memberType,
+}
+body := map[string]interface{}{"member": member}
+if roleID != "" {
+body["role_id"] = roleID
+}
+resp, err := c.Request("POST", fmt.Sprintf("/project/projects/%s/members", projectID), body)
+if err != nil {
+return nil, err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+return nil, fmt.Errorf("add project member failed with status: %d", resp.StatusCode)
+}
+var m ProjectMember
+if err := json.NewDecoder(resp.Body).Decode(&m); err != nil {
+return nil, err
+}
+return &m, nil
+}
+
+func (c *Client) RemoveProjectMember(projectID, memberID string) error {
+resp, err := c.Request("DELETE", fmt.Sprintf("/project/projects/%s/members/%s", projectID, memberID), nil)
+if err != nil {
+return err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
+return fmt.Errorf("remove project member failed with status: %d", resp.StatusCode)
+}
+return nil
+}
+
+func (c *Client) UpdateProjectMember(projectID, memberID, roleID string) (*ProjectMember, error) {
+body := map[string]interface{}{"role_id": roleID}
+resp, err := c.Request("PATCH", fmt.Sprintf("/project/projects/%s/members/%s", projectID, memberID), body)
+if err != nil {
+return nil, err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK {
+return nil, fmt.Errorf("update project member failed with status: %d", resp.StatusCode)
+}
+var m ProjectMember
+if err := json.NewDecoder(resp.Body).Decode(&m); err != nil {
+return nil, err
+}
+return &m, nil
+}
+
+// ── WorkItem Participant ───────────────────────────────────────────────────
+
+type WorkItemParticipant struct {
+ID   string `json:"id"`
+Type string `json:"type"`
+}
+
+type WorkItemParticipantListResponse struct {
+Values    []WorkItemParticipant `json:"values"`
+Total     int                   `json:"total"`
+PageSize  int                   `json:"page_size"`
+PageIndex int                   `json:"page_index"`
+}
+
+func (c *Client) ListWorkItemParticipants(workItemID string) ([]WorkItemParticipant, error) {
+resp, err := c.Request("GET", fmt.Sprintf("/project/work_items/%s/participants", workItemID), nil)
+if err != nil {
+return nil, err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK {
+return nil, fmt.Errorf("list work item participants failed with status: %d", resp.StatusCode)
+}
+var listResp WorkItemParticipantListResponse
+if err := json.NewDecoder(resp.Body).Decode(&listResp); err != nil {
+return nil, err
+}
+return listResp.Values, nil
+}
+
+func (c *Client) AddWorkItemParticipant(workItemID, userID string) (*WorkItemParticipant, error) {
+body := map[string]interface{}{"user_id": userID}
+resp, err := c.Request("POST", fmt.Sprintf("/project/work_items/%s/participants", workItemID), body)
+if err != nil {
+return nil, err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+return nil, fmt.Errorf("add work item participant failed with status: %d", resp.StatusCode)
+}
+var p WorkItemParticipant
+if err := json.NewDecoder(resp.Body).Decode(&p); err != nil {
+return nil, err
+}
+return &p, nil
+}
+
+func (c *Client) RemoveWorkItemParticipant(workItemID, participantID string) error {
+resp, err := c.Request("DELETE", fmt.Sprintf("/project/work_items/%s/participants/%s", workItemID, participantID), nil)
+if err != nil {
+return err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
+return fmt.Errorf("remove work item participant failed with status: %d", resp.StatusCode)
+}
+return nil
+}
+
+// ── WorkItem Relation ──────────────────────────────────────────────────────
+
+type WorkItemRelation struct {
+ID           string `json:"id"`
+RelationType string `json:"relation_type"`
+}
+
+type WorkItemRelationListResponse struct {
+Values    []WorkItemRelation `json:"values"`
+Total     int                `json:"total"`
+PageSize  int                `json:"page_size"`
+PageIndex int                `json:"page_index"`
+}
+
+func (c *Client) ListWorkItemRelations(workItemID string) ([]WorkItemRelation, error) {
+resp, err := c.Request("GET", fmt.Sprintf("/project/work_items/%s/relations", workItemID), nil)
+if err != nil {
+return nil, err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK {
+return nil, fmt.Errorf("list work item relations failed with status: %d", resp.StatusCode)
+}
+var listResp WorkItemRelationListResponse
+if err := json.NewDecoder(resp.Body).Decode(&listResp); err != nil {
+return nil, err
+}
+return listResp.Values, nil
+}
+
+func (c *Client) AddWorkItemRelation(workItemID, targetWorkItemID, relationType string) (*WorkItemRelation, error) {
+body := map[string]interface{}{
+"target_work_item_id": targetWorkItemID,
+"relation_type":       relationType,
+}
+resp, err := c.Request("POST", fmt.Sprintf("/project/work_items/%s/relations", workItemID), body)
+if err != nil {
+return nil, err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+return nil, fmt.Errorf("add work item relation failed with status: %d", resp.StatusCode)
+}
+var r WorkItemRelation
+if err := json.NewDecoder(resp.Body).Decode(&r); err != nil {
+return nil, err
+}
+return &r, nil
+}
+
+func (c *Client) RemoveWorkItemRelation(workItemID, relationID string) error {
+resp, err := c.Request("DELETE", fmt.Sprintf("/project/work_items/%s/relations/%s", workItemID, relationID), nil)
+if err != nil {
+return err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
+return fmt.Errorf("remove work item relation failed with status: %d", resp.StatusCode)
+}
+return nil
+}
+
+// ── WorkItem Transition History ────────────────────────────────────────────
+
+type WorkItemTransitionHistory struct {
+ID        string  `json:"id"`
+FromState *Status `json:"from_state"`
+ToState   *Status `json:"to_state"`
+CreatedAt int64   `json:"created_at"`
+}
+
+type WorkItemTransitionHistoryListResponse struct {
+Values    []WorkItemTransitionHistory `json:"values"`
+Total     int                         `json:"total"`
+PageSize  int                         `json:"page_size"`
+PageIndex int                         `json:"page_index"`
+}
+
+func (c *Client) ListWorkItemTransitionHistories(workItemID string) ([]WorkItemTransitionHistory, error) {
+resp, err := c.Request("GET", fmt.Sprintf("/project/work_items/%s/transition_histories", workItemID), nil)
+if err != nil {
+return nil, err
+}
+defer resp.Body.Close()
+if resp.StatusCode != http.StatusOK {
+return nil, fmt.Errorf("list work item transition histories failed with status: %d", resp.StatusCode)
+}
+var listResp WorkItemTransitionHistoryListResponse
+if err := json.NewDecoder(resp.Body).Decode(&listResp); err != nil {
+return nil, err
+}
+return listResp.Values, nil
+}
