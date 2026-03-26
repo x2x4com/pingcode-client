@@ -269,7 +269,9 @@ func init() {
 	iterationListCmd.MarkFlagRequired("project-id")
 
 	iterationGetCmd.Flags().StringVarP(&resourceID, "id", "i", "", "Resource ID")
+	iterationGetCmd.Flags().StringVarP(&projectID, "project-id", "p", "", "PingCode Project ID")
 	iterationGetCmd.MarkFlagRequired("id")
+	iterationGetCmd.MarkFlagRequired("project-id")
 
 	iterationCreateCmd.Flags().StringVarP(&projectID, "project-id", "p", "", "PingCode Project ID")
 	iterationCreateCmd.Flags().StringVarP(&name, "name", "n", "", "Name of the resource")
@@ -281,6 +283,7 @@ func init() {
 	iterationCreateCmd.MarkFlagRequired("project-id")
 	iterationCreateCmd.MarkFlagRequired("name")
 
+	iterationUpdateCmd.Flags().StringVarP(&projectID, "project-id", "p", "", "PingCode Project ID")
 	iterationUpdateCmd.Flags().StringVarP(&resourceID, "id", "i", "", "Resource ID")
 	iterationUpdateCmd.Flags().StringVarP(&name, "name", "n", "", "Name of the resource")
 	iterationUpdateCmd.Flags().StringVar(&startDate, "start-date", "", "Start date (YYYY-MM-DD)")
@@ -288,16 +291,21 @@ func init() {
 	iterationUpdateCmd.Flags().StringVar(&assignee, "assignee-id", "", "Assignee user ID")
 	iterationUpdateCmd.Flags().StringVarP(&desc, "desc", "d", "", "Description")
 	iterationUpdateCmd.Flags().StringVar(&status, "status", "", "Iteration status")
+	iterationUpdateCmd.MarkFlagRequired("project-id")
 	iterationUpdateCmd.MarkFlagRequired("id")
 
+	iterationDeleteCmd.Flags().StringVarP(&projectID, "project-id", "p", "", "PingCode Project ID")
 	iterationDeleteCmd.Flags().StringVarP(&resourceID, "id", "i", "", "Resource ID")
+	iterationDeleteCmd.MarkFlagRequired("project-id")
 	iterationDeleteCmd.MarkFlagRequired("id")
 
 	// Version
 	versionListCmd.Flags().StringVarP(&projectID, "project-id", "p", "", "PingCode Project ID")
 	versionListCmd.MarkFlagRequired("project-id")
 
+	versionGetCmd.Flags().StringVarP(&projectID, "project-id", "p", "", "PingCode Project ID")
 	versionGetCmd.Flags().StringVarP(&resourceID, "id", "i", "", "Resource ID")
+	versionGetCmd.MarkFlagRequired("project-id")
 	versionGetCmd.MarkFlagRequired("id")
 
 	versionCreateCmd.Flags().StringVarP(&projectID, "project-id", "p", "", "PingCode Project ID")
@@ -309,15 +317,19 @@ func init() {
 	versionCreateCmd.MarkFlagRequired("project-id")
 	versionCreateCmd.MarkFlagRequired("name")
 
+	versionUpdateCmd.Flags().StringVarP(&projectID, "project-id", "p", "", "PingCode Project ID")
 	versionUpdateCmd.Flags().StringVarP(&resourceID, "id", "i", "", "Resource ID")
 	versionUpdateCmd.Flags().StringVarP(&name, "name", "n", "", "Name of the resource")
 	versionUpdateCmd.Flags().StringVar(&startDate, "start-date", "", "Start date (YYYY-MM-DD)")
 	versionUpdateCmd.Flags().StringVar(&releaseDate, "end-date", "", "Release/end date (YYYY-MM-DD)")
 	versionUpdateCmd.Flags().StringVar(&assignee, "assignee-id", "", "Assignee user ID")
 	versionUpdateCmd.Flags().StringVar(&stageID, "stage-id", "", "Stage ID")
+	versionUpdateCmd.MarkFlagRequired("project-id")
 	versionUpdateCmd.MarkFlagRequired("id")
 
+	versionDeleteCmd.Flags().StringVarP(&projectID, "project-id", "p", "", "PingCode Project ID")
 	versionDeleteCmd.Flags().StringVarP(&resourceID, "id", "i", "", "Resource ID")
+	versionDeleteCmd.MarkFlagRequired("project-id")
 	versionDeleteCmd.MarkFlagRequired("id")
 
 	// Kanban
@@ -942,7 +954,7 @@ var iterationGetCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.GetIteration(c, resourceID)
+		project.GetIteration(c, projectID, resourceID)
 	},
 }
 var iterationCreateCmd = &cobra.Command{
@@ -964,7 +976,7 @@ var iterationUpdateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.UpdateIteration(c, resourceID, name, startDate, endDate, assignee, desc, status)
+		project.UpdateIteration(c, projectID, resourceID, name, startDate, endDate, assignee, desc, status)
 	},
 }
 var iterationDeleteCmd = &cobra.Command{
@@ -975,7 +987,7 @@ var iterationDeleteCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.DeleteIteration(c, resourceID)
+		project.DeleteIteration(c, projectID, resourceID)
 	},
 }
 
@@ -999,7 +1011,7 @@ var versionGetCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.GetVersion(c, resourceID)
+		project.GetVersion(c, projectID, resourceID)
 	},
 }
 var versionCreateCmd = &cobra.Command{
@@ -1021,7 +1033,7 @@ var versionUpdateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.UpdateVersion(c, resourceID, name, startDate, releaseDate, assignee, stageID)
+		project.UpdateVersion(c, projectID, resourceID, name, startDate, releaseDate, assignee, stageID)
 	},
 }
 var versionDeleteCmd = &cobra.Command{
@@ -1032,7 +1044,7 @@ var versionDeleteCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.DeleteVersion(c, resourceID)
+		project.DeleteVersion(c, projectID, resourceID)
 	},
 }
 

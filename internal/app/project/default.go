@@ -21,7 +21,7 @@ func parseDateToMs(s string) int64 {
 	if err != nil {
 		log.Fatalf("Invalid date format %q, expected YYYY-MM-DD", s)
 	}
-	return t.UTC().UnixMilli()
+	return t.UTC().Unix()
 }
 
 func ListProjects(client *sdk.Client) {
@@ -204,11 +204,11 @@ func RemoveWorkItemTag(client *sdk.Client, workItemID string, tagID string) {
 	fmt.Printf("Removed Tag %s from WorkItem %s\n", tagID, workItemID)
 }
 
-func GetIteration(client *sdk.Client, id string) {
+func GetIteration(client *sdk.Client, projectID, id string) {
 	if id == "" {
 		log.Fatal("Iteration ID is required")
 	}
-	iter, err := client.GetIteration(id)
+	iter, err := client.GetIteration(projectID, id)
 	if err != nil {
 		log.Fatalf("Error getting iteration: %v", err)
 	}
@@ -235,7 +235,7 @@ func CreateIteration(client *sdk.Client, projectID, name, start, end, assigneeID
 	fmt.Printf("Created Iteration: %s (ID: %s)\n", created.Name, created.ID)
 }
 
-func UpdateIteration(client *sdk.Client, id, name, start, end, assigneeID, desc, status string) {
+func UpdateIteration(client *sdk.Client, projectID, id, name, start, end, assigneeID, desc, status string) {
 	if id == "" {
 		log.Fatal("Iteration ID is required")
 	}
@@ -247,29 +247,29 @@ func UpdateIteration(client *sdk.Client, id, name, start, end, assigneeID, desc,
 		Description: desc,
 		Status:      status,
 	}
-	updated, err := client.UpdateIteration(id, iter)
+	updated, err := client.UpdateIteration(projectID, id, iter)
 	if err != nil {
 		log.Fatalf("Error updating iteration: %v", err)
 	}
 	fmt.Printf("Updated Iteration: %s (ID: %s)\n", updated.Name, updated.ID)
 }
 
-func DeleteIteration(client *sdk.Client, id string) {
+func DeleteIteration(client *sdk.Client, projectID, id string) {
 	if id == "" {
 		log.Fatal("Iteration ID is required")
 	}
-	err := client.DeleteIteration(id)
+	err := client.DeleteIteration(projectID, id)
 	if err != nil {
 		log.Fatalf("Error deleting iteration: %v", err)
 	}
 	fmt.Printf("Deleted Iteration: %s\n", id)
 }
 
-func GetVersion(client *sdk.Client, id string) {
+func GetVersion(client *sdk.Client, projectID, id string) {
 	if id == "" {
 		log.Fatal("Version ID is required")
 	}
-	v, err := client.GetVersion(id)
+	v, err := client.GetVersion(projectID, id)
 	if err != nil {
 		log.Fatalf("Error getting version: %v", err)
 	}
@@ -295,7 +295,7 @@ func CreateVersion(client *sdk.Client, projectID, name, start, end, assigneeID, 
 	fmt.Printf("Created Version: %s (ID: %s)\n", created.Name, created.ID)
 }
 
-func UpdateVersion(client *sdk.Client, id, name, start, end, assigneeID, stageID string) {
+func UpdateVersion(client *sdk.Client, projectID, id, name, start, end, assigneeID, stageID string) {
 	if id == "" {
 		log.Fatal("Version ID is required")
 	}
@@ -306,18 +306,18 @@ func UpdateVersion(client *sdk.Client, id, name, start, end, assigneeID, stageID
 		AssigneeID: assigneeID,
 		StageID:    stageID,
 	}
-	updated, err := client.UpdateVersion(id, v)
+	updated, err := client.UpdateVersion(projectID, id, v)
 	if err != nil {
 		log.Fatalf("Error updating version: %v", err)
 	}
 	fmt.Printf("Updated Version: %s (ID: %s)\n", updated.Name, updated.ID)
 }
 
-func DeleteVersion(client *sdk.Client, id string) {
+func DeleteVersion(client *sdk.Client, projectID, id string) {
 	if id == "" {
 		log.Fatal("Version ID is required")
 	}
-	err := client.DeleteVersion(id)
+	err := client.DeleteVersion(projectID, id)
 	if err != nil {
 		log.Fatalf("Error deleting version: %v", err)
 	}

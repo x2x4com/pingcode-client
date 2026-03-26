@@ -626,8 +626,8 @@ func (c *Client) ListIterations(projectID string) ([]Iteration, error) {
 	return listResp.Values, nil
 }
 
-func (c *Client) GetIteration(id string) (*Iteration, error) {
-	resp, err := c.Request("GET", fmt.Sprintf("/project/sprints/%s", id), nil)
+func (c *Client) GetIteration(projectID, id string) (*Iteration, error) {
+	resp, err := c.Request("GET", fmt.Sprintf("/project/projects/%s/sprints/%s", projectID, id), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -646,7 +646,7 @@ func (c *Client) GetIteration(id string) (*Iteration, error) {
 }
 
 func (c *Client) CreateIteration(iteration *Iteration) (*Iteration, error) {
-	resp, err := c.Request("POST", "/project/sprints", iteration)
+	resp, err := c.Request("POST", fmt.Sprintf("/project/projects/%s/sprints", iteration.ProjectID), iteration)
 	if err != nil {
 		return nil, err
 	}
@@ -664,8 +664,8 @@ func (c *Client) CreateIteration(iteration *Iteration) (*Iteration, error) {
 	return &created, nil
 }
 
-func (c *Client) UpdateIteration(id string, iteration *Iteration) (*Iteration, error) {
-	resp, err := c.Request("PATCH", fmt.Sprintf("/project/sprints/%s", id), iteration)
+func (c *Client) UpdateIteration(projectID, id string, iteration *Iteration) (*Iteration, error) {
+	resp, err := c.Request("PATCH", fmt.Sprintf("/project/projects/%s/sprints/%s", projectID, id), iteration)
 	if err != nil {
 		return nil, err
 	}
@@ -683,8 +683,8 @@ func (c *Client) UpdateIteration(id string, iteration *Iteration) (*Iteration, e
 	return &updated, nil
 }
 
-func (c *Client) DeleteIteration(id string) error {
-	resp, err := c.Request("DELETE", fmt.Sprintf("/project/sprints/%s", id), nil)
+func (c *Client) DeleteIteration(projectID, id string) error {
+	resp, err := c.Request("DELETE", fmt.Sprintf("/project/projects/%s/sprints/%s", projectID, id), nil)
 	if err != nil {
 		return err
 	}
@@ -716,8 +716,8 @@ func (c *Client) ListVersions(projectID string) ([]Version, error) {
 	return listResp.Values, nil
 }
 
-func (c *Client) GetVersion(id string) (*Version, error) {
-	resp, err := c.Request("GET", fmt.Sprintf("/project/versions/%s", id), nil)
+func (c *Client) GetVersion(projectID, id string) (*Version, error) {
+	resp, err := c.Request("GET", fmt.Sprintf("/project/projects/%s/versions/%s", projectID, id), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -736,7 +736,7 @@ func (c *Client) GetVersion(id string) (*Version, error) {
 }
 
 func (c *Client) CreateVersion(version *Version) (*Version, error) {
-	resp, err := c.Request("POST", "/project/versions", version)
+	resp, err := c.Request("POST", fmt.Sprintf("/project/projects/%s/versions", version.ProjectID), version)
 	if err != nil {
 		return nil, err
 	}
@@ -754,8 +754,8 @@ func (c *Client) CreateVersion(version *Version) (*Version, error) {
 	return &created, nil
 }
 
-func (c *Client) UpdateVersion(id string, version *Version) (*Version, error) {
-	resp, err := c.Request("PATCH", fmt.Sprintf("/project/versions/%s", id), version)
+func (c *Client) UpdateVersion(projectID, id string, version *Version) (*Version, error) {
+	resp, err := c.Request("PATCH", fmt.Sprintf("/project/projects/%s/versions/%s", projectID, id), version)
 	if err != nil {
 		return nil, err
 	}
@@ -773,8 +773,8 @@ func (c *Client) UpdateVersion(id string, version *Version) (*Version, error) {
 	return &updated, nil
 }
 
-func (c *Client) DeleteVersion(id string) error {
-	resp, err := c.Request("DELETE", fmt.Sprintf("/project/versions/%s", id), nil)
+func (c *Client) DeleteVersion(projectID, id string) error {
+	resp, err := c.Request("DELETE", fmt.Sprintf("/project/projects/%s/versions/%s", projectID, id), nil)
 	if err != nil {
 		return err
 	}

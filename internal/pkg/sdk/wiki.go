@@ -30,7 +30,7 @@ type WikiSpaceMemberListResponse struct {
 
 type WikiPage struct {
 	ID       string `json:"id"`
-	Title    string `json:"title"`
+	Title    string `json:"name"`
 	SpaceID  string `json:"space_id,omitempty"`
 	ParentID string `json:"parent_id,omitempty"`
 	Type     string `json:"type,omitempty"`
@@ -261,7 +261,7 @@ func (c *Client) GetWikiPage(pageID string) (*WikiPage, error) {
 func (c *Client) CreateWikiPage(spaceID, parentID, title, pageType string) (*WikiPage, error) {
 	body := map[string]interface{}{
 		"space_id": spaceID,
-		"title":    title,
+		"name":     title,
 	}
 	if parentID != "" {
 		body["parent_id"] = parentID
@@ -287,7 +287,7 @@ func (c *Client) CreateWikiPage(spaceID, parentID, title, pageType string) (*Wik
 func (c *Client) UpdateWikiPage(pageID, title string) (*WikiPage, error) {
 	body := map[string]interface{}{}
 	if title != "" {
-		body["title"] = title
+		body["name"] = title
 	}
 	resp, err := c.Request("PATCH", fmt.Sprintf("/wiki/pages/%s", pageID), body)
 	if err != nil {
@@ -336,10 +336,8 @@ func (c *Client) GetWikiPageContent(pageID string) (*WikiPageContent, error) {
 
 func (c *Client) UpdateWikiPageContent(pageID, content, format string) (*WikiPageContent, error) {
 	body := map[string]interface{}{
-		"content": content,
-	}
-	if format != "" {
-		body["format"] = format
+		"content":     content,
+		"format_type": format,
 	}
 	resp, err := c.Request("PUT", fmt.Sprintf("/wiki/pages/%s/content", pageID), body)
 	if err != nil {
