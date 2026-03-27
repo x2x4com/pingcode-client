@@ -2,7 +2,7 @@
 
 本文档总结了使用 Go CLI 客户端管理 PingCode 产品管理 (Ship) 模块的常用命令及核心流程。
 
-`ship` 是大模块名称，下设 `product`（产品管理）和 `ideas`（需求管理）两个核心子模块。
+`ship` 是大模块名称，下设 `product`（产品管理）、`ideas`（需求管理）和 `tickets`（工单管理）三个核心子模块。
 
 编译完成的二进制文件为 `pingcode-client`
 
@@ -78,16 +78,16 @@
 ### 3.1 需求基础操作
 - **创建需求**:
   ```bash
-  pingcode-client ship ideas create --product-id {pid} --title "需求标题" --desc "描述"
+  pingcode-client ship ideas create --product-id {pid} --title "需求标题" --desc "描述" --priority-id {prid} --assignee-id {uid} --suite-id {sid}
   ```
 - **更新需求**:
   ```bash
-  pingcode-client ship ideas update --idea-id {iid} --state-id {sid} --priority-id {prid}
+  pingcode-client ship ideas update --product-id {pid} --idea-id {iid} --state-id {sid} --priority-id {prid}
   ```
 
 ### 3.2 查看流转历史
 ```bash
-pingcode-client ship ideas histories --idea-id {idea_id}
+pingcode-client ship ideas histories --product-id {pid} --idea-id {idea_id}
 ```
 
 ---
@@ -122,7 +122,7 @@ pingcode-client ship ideas histories --idea-id {idea_id}
   ```
 - **获取工单详情**:
   ```bash
-  pingcode-client ship tickets get --id {ticket_id}
+  pingcode-client ship tickets get --product-id {pid} --id {ticket_id}
   ```
 - **创建工单**:
   ```bash
@@ -137,9 +137,9 @@ pingcode-client ship ideas histories --idea-id {idea_id}
 - **更新工单**:
   ```bash
   # 更新状态
-  pingcode-client ship tickets update --id {ticket_id} --state-id {new_state_id}
+  pingcode-client ship tickets update --product-id {pid} --id {ticket_id} --state-id {new_state_id}
   # 更改负责人
-  pingcode-client ship tickets update --id {ticket_id} --assignee-id {user_id}
+  pingcode-client ship tickets update --product-id {pid} --id {ticket_id} --assignee-id {user_id}
   # 设置解决方案
   pingcode-client ship tickets update --id {ticket_id} --solution-id {solution_id}
   ```

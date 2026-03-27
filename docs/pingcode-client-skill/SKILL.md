@@ -35,7 +35,7 @@ https://github.com/x2x4com/pingcode-client/releases
 bash scripts/install.sh
 
 # 或指定版本
-bash scripts/install.sh v0.1.1
+bash scripts/install.sh v0.1.4
 ```
 
 脚本支持以下平台：
