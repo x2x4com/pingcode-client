@@ -1,6 +1,6 @@
 ---
 name: pingcode-client-skill
-description: "Use when: 通过 CLI 管理 PingCode（创建/查询/更新工作项、需求/产品/版本、项目、Wiki、测试用例、组织成员）。触发词：pingcode, pingcode-client, pingcode workitem, pingcode ship, pingcode project, pingcode wiki, pingcode testhub。示例命令：pingcode-client ship ideas create；pingcode-client project workitem create。依赖：pingcode-client 二进制，需设置环境变量 PINGCODE_CLIENT_ID 和 PINGCODE_CLIENT_SECRET。"
+description: "Use when: 需要操作 PingCode 项目管理平台，包括：创建/查询/更新/删除工作项、需求、用户故事、任务、缺陷(Bug)；管理项目迭代(Sprint)、版本(Release)、看板(Kanban)；管理 Wiki 知识库页面；管理测试用例、测试计划、测试执行(TestHub)；查询企业成员和部门信息。适用角色：产品经理(PM)规划需求、研发经理拆分任务分配迭代、开发工程师认领和更新任务状态、测试工程师管理测试用例和计划、DevOps 管理版本发布。触发关键词：PingCode、工作项、需求、迭代、Sprint、版本、看板、Wiki、测试计划、测试用例、项目管理。"
 metadata:
   {
     "openclaw":
