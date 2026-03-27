@@ -7,10 +7,10 @@ import (
 )
 
 type Product struct {
-	ID          string          `json:"id"`
-	Name        string          `json:"name"`
-	Identifier  string          `json:"identifier"`
-	Description string          `json:"description"`
+	ID          string          `json:"id,omitempty"`
+	Name        string          `json:"name,omitempty"`
+	Identifier  string          `json:"identifier,omitempty"`
+	Description string          `json:"description,omitempty"`
 	Members     []ProductMember `json:"members,omitempty"`
 	CreatedAt   int64           `json:"created_at,omitempty"`
 	UpdatedAt   int64           `json:"updated_at,omitempty"`
@@ -78,23 +78,23 @@ type ProductTicketTypeListResponse struct {
 }
 
 type Idea struct {
-	ID          string         `json:"id"`
-	Identifier  string         `json:"identifier"`
-	Title       string         `json:"title"`
-	Description string         `json:"description"`
+	ID          string         `json:"id,omitempty"`
+	Identifier  string         `json:"identifier,omitempty"`
+	Title       string         `json:"title,omitempty"`
+	Description string         `json:"description,omitempty"`
 	ProductID   string         `json:"product_id,omitempty"`
 	AssigneeID  string         `json:"assignee_id,omitempty"`
 	SuiteID     string         `json:"suite_id,omitempty"`
 	PlanID      string         `json:"plan_id,omitempty"`
 	StateID     string         `json:"state_id,omitempty"`
 	PriorityID  string         `json:"priority_id,omitempty"`
-	Progress    float64        `json:"progress"`
+	Progress    float64        `json:"progress,omitempty"`
 	State       *IdeaState     `json:"state,omitempty"`
 	Priority    *IdeaPriority  `json:"priority,omitempty"`
 	Suite       *IdeaSuite     `json:"suite,omitempty"`
 	Plan        *IdeaPlan      `json:"plan,omitempty"`
-	CreatedAt   int64          `json:"created_at"`
-	UpdatedAt   int64          `json:"updated_at"`
+	CreatedAt   int64          `json:"created_at,omitempty"`
+	UpdatedAt   int64          `json:"updated_at,omitempty"`
 	Properties  map[string]any `json:"properties,omitempty"`
 }
 
@@ -170,7 +170,7 @@ type IdeaTransitionHistoryListResponse struct {
 }
 
 func (c *Client) ListProducts() ([]Product, error) {
-	resp, err := c.Request("GET", "/v1/ship/products", nil)
+	resp, err := c.Request("GET", "/ship/products", nil)
 
 	if err != nil {
 		return nil, err
@@ -190,7 +190,7 @@ func (c *Client) ListProducts() ([]Product, error) {
 }
 
 func (c *Client) CreateProduct(product *Product) (*Product, error) {
-	resp, err := c.Request("POST", "/v1/ship/products", product)
+	resp, err := c.Request("POST", "/ship/products", product)
 	if err != nil {
 		return nil, err
 	}
@@ -209,7 +209,7 @@ func (c *Client) CreateProduct(product *Product) (*Product, error) {
 }
 
 func (c *Client) UpdateProduct(productID string, product *Product) (*Product, error) {
-	resp, err := c.Request("PATCH", fmt.Sprintf("/v1/ship/products/%s", productID), product)
+	resp, err := c.Request("PATCH", fmt.Sprintf("/ship/products/%s", productID), product)
 	if err != nil {
 		return nil, err
 	}
@@ -228,7 +228,7 @@ func (c *Client) UpdateProduct(productID string, product *Product) (*Product, er
 }
 
 func (c *Client) ListProductMembers(productID string) ([]ProductMember, error) {
-	resp, err := c.Request("GET", fmt.Sprintf("/v1/ship/products/%s/members", productID), nil)
+	resp, err := c.Request("GET", fmt.Sprintf("/ship/products/%s/members", productID), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -257,7 +257,7 @@ func (c *Client) AddProductMember(productID string, memberID string, memberType 
 		payload["role_id"] = roleID
 	}
 
-	resp, err := c.Request("POST", fmt.Sprintf("/v1/ship/products/%s/members", productID), payload)
+	resp, err := c.Request("POST", fmt.Sprintf("/ship/products/%s/members", productID), payload)
 	if err != nil {
 		return nil, err
 	}
@@ -276,7 +276,7 @@ func (c *Client) AddProductMember(productID string, memberID string, memberType 
 }
 
 func (c *Client) RemoveProductMember(productID string, memberID string) error {
-	resp, err := c.Request("DELETE", fmt.Sprintf("/v1/ship/products/%s/members/%s", productID, memberID), nil)
+	resp, err := c.Request("DELETE", fmt.Sprintf("/ship/products/%s/members/%s", productID, memberID), nil)
 	if err != nil {
 		return err
 	}
@@ -290,7 +290,7 @@ func (c *Client) RemoveProductMember(productID string, memberID string) error {
 }
 
 func (c *Client) AddProductSuite(productID string, suite *IdeaSuite) (*IdeaSuite, error) {
-	resp, err := c.Request("POST", fmt.Sprintf("/v1/ship/products/%s/suites", productID), suite)
+	resp, err := c.Request("POST", fmt.Sprintf("/ship/products/%s/suites", productID), suite)
 	if err != nil {
 		return nil, err
 	}
@@ -309,7 +309,7 @@ func (c *Client) AddProductSuite(productID string, suite *IdeaSuite) (*IdeaSuite
 }
 
 func (c *Client) RemoveProductSuite(productID string, suiteID string) error {
-	resp, err := c.Request("DELETE", fmt.Sprintf("/v1/ship/products/%s/suites/%s", productID, suiteID), nil)
+	resp, err := c.Request("DELETE", fmt.Sprintf("/ship/products/%s/suites/%s", productID, suiteID), nil)
 	if err != nil {
 		return err
 	}
@@ -323,7 +323,7 @@ func (c *Client) RemoveProductSuite(productID string, suiteID string) error {
 }
 
 func (c *Client) ListProductSuites(productID string) ([]IdeaSuite, error) {
-	resp, err := c.Request("GET", fmt.Sprintf("/v1/ship/products/%s/suites", productID), nil)
+	resp, err := c.Request("GET", fmt.Sprintf("/ship/products/%s/suites", productID), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -342,7 +342,7 @@ func (c *Client) ListProductSuites(productID string) ([]IdeaSuite, error) {
 }
 
 func (c *Client) ListProductPlans(productID string) ([]IdeaPlan, error) {
-	resp, err := c.Request("GET", fmt.Sprintf("/v1/ship/products/%s/plans", productID), nil)
+	resp, err := c.Request("GET", fmt.Sprintf("/ship/products/%s/plans", productID), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -361,7 +361,7 @@ func (c *Client) ListProductPlans(productID string) ([]IdeaPlan, error) {
 }
 
 func (c *Client) ListProductChannels(productID string) ([]ProductChannel, error) {
-	resp, err := c.Request("GET", fmt.Sprintf("/v1/ship/products/%s/channels", productID), nil)
+	resp, err := c.Request("GET", fmt.Sprintf("/ship/products/%s/channels", productID), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -380,7 +380,7 @@ func (c *Client) ListProductChannels(productID string) ([]ProductChannel, error)
 }
 
 func (c *Client) ListProductTicketTypes(productID string) ([]ProductTicketType, error) {
-	resp, err := c.Request("GET", fmt.Sprintf("/v1/ship/products/%s/ticket_types", productID), nil)
+	resp, err := c.Request("GET", fmt.Sprintf("/ship/products/%s/ticket_types", productID), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -399,7 +399,7 @@ func (c *Client) ListProductTicketTypes(productID string) ([]ProductTicketType, 
 }
 
 func (c *Client) ListProductTags(productID string) ([]ProductTag, error) {
-	resp, err := c.Request("GET", fmt.Sprintf("/v1/ship/products/%s/tags", productID), nil)
+	resp, err := c.Request("GET", fmt.Sprintf("/ship/products/%s/tags", productID), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -421,7 +421,7 @@ func (c *Client) AddProductTag(productID string, name string) (*ProductTag, erro
 	payload := map[string]string{
 		"name": name,
 	}
-	resp, err := c.Request("POST", fmt.Sprintf("/v1/ship/products/%s/tags", productID), payload)
+	resp, err := c.Request("POST", fmt.Sprintf("/ship/products/%s/tags", productID), payload)
 	if err != nil {
 		return nil, err
 	}
@@ -440,7 +440,7 @@ func (c *Client) AddProductTag(productID string, name string) (*ProductTag, erro
 }
 
 func (c *Client) RemoveProductTag(productID string, tagID string) error {
-	resp, err := c.Request("DELETE", fmt.Sprintf("/v1/ship/products/%s/tags/%s", productID, tagID), nil)
+	resp, err := c.Request("DELETE", fmt.Sprintf("/ship/products/%s/tags/%s", productID, tagID), nil)
 	if err != nil {
 		return err
 	}
@@ -454,7 +454,7 @@ func (c *Client) RemoveProductTag(productID string, tagID string) error {
 }
 
 func (c *Client) ListIdeas(productID string) ([]Idea, error) {
-	url := "/v1/ship/ideas"
+	url := "/ship/ideas"
 	if productID != "" {
 		url += "?product_id=" + productID
 	}
@@ -477,7 +477,7 @@ func (c *Client) ListIdeas(productID string) ([]Idea, error) {
 }
 
 func (c *Client) CreateIdea(idea *Idea) (*Idea, error) {
-	resp, err := c.Request("POST", "/v1/ship/ideas", idea)
+	resp, err := c.Request("POST", "/ship/ideas", idea)
 	if err != nil {
 		return nil, err
 	}
@@ -496,7 +496,7 @@ func (c *Client) CreateIdea(idea *Idea) (*Idea, error) {
 }
 
 func (c *Client) UpdateIdea(ideaID string, idea *Idea) (*Idea, error) {
-	resp, err := c.Request("PATCH", fmt.Sprintf("/v1/ship/ideas/%s", ideaID), idea)
+	resp, err := c.Request("PATCH", fmt.Sprintf("/ship/ideas/%s", ideaID), idea)
 	if err != nil {
 		return nil, err
 	}
@@ -515,7 +515,7 @@ func (c *Client) UpdateIdea(ideaID string, idea *Idea) (*Idea, error) {
 }
 
 func (c *Client) ListIdeaStates(productID string) ([]IdeaState, error) {
-	resp, err := c.Request("GET", fmt.Sprintf("/v1/ship/idea/states?product_id=%s", productID), nil)
+	resp, err := c.Request("GET", fmt.Sprintf("/ship/idea/states?product_id=%s", productID), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -534,7 +534,7 @@ func (c *Client) ListIdeaStates(productID string) ([]IdeaState, error) {
 }
 
 func (c *Client) ListIdeaPriorities(productID string) ([]IdeaPriority, error) {
-	resp, err := c.Request("GET", fmt.Sprintf("/v1/ship/idea/priorities?product_id=%s", productID), nil)
+	resp, err := c.Request("GET", fmt.Sprintf("/ship/idea/priorities?product_id=%s", productID), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -553,7 +553,7 @@ func (c *Client) ListIdeaPriorities(productID string) ([]IdeaPriority, error) {
 }
 
 func (c *Client) ListIdeaProperties(productID string) ([]IdeaProperty, error) {
-	resp, err := c.Request("GET", fmt.Sprintf("/v1/ship/idea/properties?product_id=%s", productID), nil)
+	resp, err := c.Request("GET", fmt.Sprintf("/ship/idea/properties?product_id=%s", productID), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -572,7 +572,7 @@ func (c *Client) ListIdeaProperties(productID string) ([]IdeaProperty, error) {
 }
 
 func (c *Client) ListIdeaSuites(productID string) ([]IdeaSuite, error) {
-	resp, err := c.Request("GET", fmt.Sprintf("/v1/ship/idea/suites?product_id=%s", productID), nil)
+	resp, err := c.Request("GET", fmt.Sprintf("/ship/idea/suites?product_id=%s", productID), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -591,7 +591,7 @@ func (c *Client) ListIdeaSuites(productID string) ([]IdeaSuite, error) {
 }
 
 func (c *Client) ListIdeaPlans(productID string) ([]IdeaPlan, error) {
-	resp, err := c.Request("GET", fmt.Sprintf("/v1/ship/idea/plans?product_id=%s", productID), nil)
+	resp, err := c.Request("GET", fmt.Sprintf("/ship/idea/plans?product_id=%s", productID), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -610,7 +610,7 @@ func (c *Client) ListIdeaPlans(productID string) ([]IdeaPlan, error) {
 }
 
 func (c *Client) ListIdeaTransitionHistories(ideaID string) ([]IdeaTransitionHistory, error) {
-	resp, err := c.Request("GET", fmt.Sprintf("/v1/ship/ideas/%s/transition_histories", ideaID), nil)
+	resp, err := c.Request("GET", fmt.Sprintf("/ship/ideas/%s/transition_histories", ideaID), nil)
 	if err != nil {
 		return nil, err
 	}

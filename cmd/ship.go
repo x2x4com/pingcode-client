@@ -293,6 +293,7 @@ var createIdeaCmd = &cobra.Command{
 			Description: desc,
 			AssigneeID:  assigneeID,
 			SuiteID:     suiteID,
+			PriorityID:  priorityID,
 		})
 	},
 }
@@ -460,6 +461,7 @@ func init() {
 	createIdeaCmd.Flags().StringVar(&desc, "desc", "", "需求描述")
 	createIdeaCmd.Flags().StringVar(&assigneeID, "assignee-id", "", "负责人 ID")
 	createIdeaCmd.Flags().StringVar(&suiteID, "suite-id", "", "模块 ID")
+	createIdeaCmd.Flags().StringVar(&priorityID, "priority-id", "", "优先级 ID")
 
 	updateIdeaCmd.Flags().StringVar(&title, "title", "", "需求标题")
 	updateIdeaCmd.Flags().StringVar(&desc, "desc", "", "需求描述")
