@@ -4,3 +4,4 @@ docs/pingcode-skills/scripts/pingcode-client
 .env
 bin/
 dist/
+.claude/
