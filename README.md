@@ -60,6 +60,38 @@ pingcode-client --client-id="xxx" --client-secret="xxx" [command]
 pingcode-client [command] --help
 ```
 
+### 输出格式选项
+
+CLI 支持灵活的输出格式，方便在不同场景下使用：
+
+#### `--output` 输出格式
+
+| 格式 | 说明 | 示例 |
+|------|------|------|
+| `table` | 表格形式展示（默认） | `--output table` |
+| `json` | JSON 格式 | `--output json` |
+| `yaml` | YAML 格式 | `--output yaml` |
+| `markdown` | Markdown 表格 | `--output markdown` |
+
+#### `--raw` 原始数据
+
+使用 `--raw` 参数可以获取 API 返回的完整原始数据，不经过简化处理：
+
+```bash
+# 简化输出（默认）
+pingcode-client ship product list
+
+# 原始 JSON 输出
+pingcode-client ship product list --raw --output json
+
+# 原始 YAML 输出
+pingcode-client project workitem list -p PROJECT_ID --raw --output yaml
+```
+
+**说明**：
+- 默认情况下，CLI 会简化输出，隐藏嵌套的对象详情，仅展示关键字段
+- 使用 `--raw` 可以获取完整的 API 响应，便于调试或二次处理
+
 ### 核心模块命令
 
 #### 1. 项目管理 (`project`)
@@ -94,9 +126,12 @@ pingcode-client [command] --help
 ## 扩展文档
 
 更多详细的模块指南和 API 映射，请参考：
-- [Ship 模块指南](docs/pingcode-skills/references/ship_guide.md)
-- [工作项指南](docs/pingcode-skills/references/workitem_guide.md)
-- [技能库文档](docs/pingcode-skills/skills.md)
+- [Ship 模块指南](docs/pingcode-client-skill/references/ship_guide.md)
+- [Project 模块指南](docs/pingcode-client-skill/references/project_guide.md)
+- [Wiki 模块指南](docs/pingcode-client-skill/references/wiki_guide.md)
+- [TestHub 模块指南](docs/pingcode-client-skill/references/testhub_guide.md)
+- [Directory 模块指南](docs/pingcode-client-skill/references/directory_guide.md)
+- [技能库文档](docs/pingcode-client-skill/SKILL.md)
 
 ## 贡献指南
 

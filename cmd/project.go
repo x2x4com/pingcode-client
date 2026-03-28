@@ -3,6 +3,7 @@ package cmd
 import (
 	"log"
 	"pingcode-client/internal/app/project"
+	"pingcode-client/internal/pkg/output"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -597,7 +598,16 @@ var iterationSectionListCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.ListSprintSections(c, projectID)
+		data, err := project.ListSprintSections(c, projectID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMapSlice(data), opts)
+		}
 	},
 }
 
@@ -609,7 +619,16 @@ var iterationSectionCreateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.CreateSprintSection(c, projectID, name)
+		data, err := project.CreateSprintSection(c, projectID, name)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 
@@ -621,7 +640,16 @@ var iterationSectionUpdateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.UpdateSprintSection(c, projectID, sectionID, name)
+		data, err := project.UpdateSprintSection(c, projectID, sectionID, name)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 
@@ -633,7 +661,12 @@ var iterationSectionDeleteCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.DeleteSprintSection(c, projectID, sectionID)
+		err = project.DeleteSprintSection(c, projectID, sectionID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		output.FormatAndPrint(map[string]string{"message": "Deleted section", "id": sectionID}, opts)
 	},
 }
 
@@ -649,7 +682,16 @@ var iterationCategoryListCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.ListSprintCategories(c, projectID)
+		data, err := project.ListSprintCategories(c, projectID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMapSlice(data), opts)
+		}
 	},
 }
 
@@ -661,7 +703,16 @@ var iterationCategoryCreateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.CreateSprintCategory(c, projectID, name, sectionID)
+		data, err := project.CreateSprintCategory(c, projectID, name, sectionID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 
@@ -673,7 +724,16 @@ var iterationCategoryUpdateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.UpdateSprintCategory(c, projectID, categoryID, name)
+		data, err := project.UpdateSprintCategory(c, projectID, categoryID, name)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 
@@ -685,7 +745,12 @@ var iterationCategoryDeleteCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.DeleteSprintCategory(c, projectID, categoryID)
+		err = project.DeleteSprintCategory(c, projectID, categoryID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		output.FormatAndPrint(map[string]string{"message": "Deleted category", "id": categoryID}, opts)
 	},
 }
 
@@ -701,7 +766,16 @@ var versionSectionListCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.ListVersionSections(c, projectID)
+		data, err := project.ListVersionSections(c, projectID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMapSlice(data), opts)
+		}
 	},
 }
 
@@ -713,7 +787,16 @@ var versionSectionCreateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.CreateVersionSection(c, projectID, name)
+		data, err := project.CreateVersionSection(c, projectID, name)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 
@@ -725,7 +808,16 @@ var versionSectionUpdateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.UpdateVersionSection(c, projectID, sectionID, name)
+		data, err := project.UpdateVersionSection(c, projectID, sectionID, name)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 
@@ -737,7 +829,12 @@ var versionSectionDeleteCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.DeleteVersionSection(c, projectID, sectionID)
+		err = project.DeleteVersionSection(c, projectID, sectionID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		output.FormatAndPrint(map[string]string{"message": "Deleted section", "id": sectionID}, opts)
 	},
 }
 
@@ -753,7 +850,16 @@ var versionCategoryListCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.ListVersionCategories(c, projectID)
+		data, err := project.ListVersionCategories(c, projectID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMapSlice(data), opts)
+		}
 	},
 }
 
@@ -765,7 +871,16 @@ var versionCategoryCreateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.CreateVersionCategory(c, projectID, name, sectionID)
+		data, err := project.CreateVersionCategory(c, projectID, name, sectionID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 
@@ -777,7 +892,16 @@ var versionCategoryUpdateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.UpdateVersionCategory(c, projectID, categoryID, name)
+		data, err := project.UpdateVersionCategory(c, projectID, categoryID, name)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 
@@ -789,7 +913,12 @@ var versionCategoryDeleteCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.DeleteVersionCategory(c, projectID, categoryID)
+		err = project.DeleteVersionCategory(c, projectID, categoryID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		output.FormatAndPrint(map[string]string{"message": "Deleted category", "id": categoryID}, opts)
 	},
 }
 
@@ -802,7 +931,16 @@ var projectListCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.ListProjects(c)
+		data, err := project.ListProjects(c)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMapSlice(data), opts)
+		}
 	},
 }
 var projectGetCmd = &cobra.Command{
@@ -813,7 +951,16 @@ var projectGetCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.GetProject(c, resourceID)
+		data, err := project.GetProject(c, resourceID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 var projectCreateCmd = &cobra.Command{
@@ -824,7 +971,16 @@ var projectCreateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.CreateProject(c, name, desc, itemType)
+		data, err := project.CreateProject(c, name, desc, itemType)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 var projectUpdateCmd = &cobra.Command{
@@ -835,7 +991,16 @@ var projectUpdateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.UpdateProject(c, resourceID, name, desc)
+		data, err := project.UpdateProject(c, resourceID, name, desc)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 var projectDeleteCmd = &cobra.Command{
@@ -846,7 +1011,12 @@ var projectDeleteCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.DeleteProject(c, resourceID)
+		err = project.DeleteProject(c, resourceID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		output.FormatAndPrint(map[string]string{"message": "Deleted project", "id": resourceID}, opts)
 	},
 }
 
@@ -859,7 +1029,16 @@ var workitemListCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.ListWorkItems(c, projectID, tagIDs, stateIDs, sprintID, assignee)
+		data, err := project.ListWorkItems(c, projectID, tagIDs, stateIDs, sprintID, assignee)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMapSlice(data), opts)
+		}
 	},
 }
 var workitemGetCmd = &cobra.Command{
@@ -870,7 +1049,16 @@ var workitemGetCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.GetWorkItem(c, resourceID, identifier)
+		data, err := project.GetWorkItem(c, resourceID, identifier)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 var workitemCreateCmd = &cobra.Command{
@@ -881,7 +1069,16 @@ var workitemCreateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.CreateWorkItem(c, projectID, title, desc, itemType, typeID, status, priority, assignee, sprintID, boardID, entryID, swimlaneID, parentID, splitComma(versionIDs))
+		data, err := project.CreateWorkItem(c, projectID, title, desc, itemType, typeID, status, priority, assignee, sprintID, boardID, entryID, swimlaneID, parentID, splitComma(versionIDs))
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 var workitemUpdateCmd = &cobra.Command{
@@ -892,7 +1089,16 @@ var workitemUpdateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.UpdateWorkItem(c, resourceID, title, desc, status, priority, assignee, sprintID, boardID, entryID, swimlaneID, parentID, splitComma(versionIDs))
+		data, err := project.UpdateWorkItem(c, resourceID, title, desc, status, priority, assignee, sprintID, boardID, entryID, swimlaneID, parentID, splitComma(versionIDs))
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 var workitemDeleteCmd = &cobra.Command{
@@ -903,7 +1109,12 @@ var workitemDeleteCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.DeleteWorkItem(c, resourceID)
+		err = project.DeleteWorkItem(c, resourceID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		output.FormatAndPrint(map[string]string{"message": "Deleted workitem", "id": resourceID}, opts)
 	},
 }
 
@@ -920,7 +1131,12 @@ var workitemTagAddCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.AddWorkItemTag(c, resourceID, tagID)
+		err = project.AddWorkItemTag(c, resourceID, tagID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		output.FormatAndPrint(map[string]string{"message": "Tag added", "workitem_id": resourceID, "tag_id": tagID}, opts)
 	},
 }
 
@@ -932,7 +1148,12 @@ var workitemTagRemoveCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.RemoveWorkItemTag(c, resourceID, tagID)
+		err = project.RemoveWorkItemTag(c, resourceID, tagID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		output.FormatAndPrint(map[string]string{"message": "Tag removed", "workitem_id": resourceID, "tag_id": tagID}, opts)
 	},
 }
 
@@ -945,7 +1166,16 @@ var iterationListCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.ListIterations(c, projectID)
+		data, err := project.ListIterations(c, projectID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMapSlice(data), opts)
+		}
 	},
 }
 var iterationGetCmd = &cobra.Command{
@@ -956,7 +1186,16 @@ var iterationGetCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.GetIteration(c, projectID, resourceID)
+		data, err := project.GetIteration(c, projectID, resourceID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 var iterationCreateCmd = &cobra.Command{
@@ -967,7 +1206,16 @@ var iterationCreateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.CreateIteration(c, projectID, name, startDate, endDate, assignee, desc, status)
+		data, err := project.CreateIteration(c, projectID, name, startDate, endDate, assignee, desc, status)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 var iterationUpdateCmd = &cobra.Command{
@@ -978,7 +1226,16 @@ var iterationUpdateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.UpdateIteration(c, projectID, resourceID, name, startDate, endDate, assignee, desc, status)
+		data, err := project.UpdateIteration(c, projectID, resourceID, name, startDate, endDate, assignee, desc, status)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 var iterationDeleteCmd = &cobra.Command{
@@ -998,7 +1255,16 @@ var versionListCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.ListVersions(c, projectID)
+		data, err := project.ListVersions(c, projectID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMapSlice(data), opts)
+		}
 	},
 }
 var versionGetCmd = &cobra.Command{
@@ -1009,7 +1275,16 @@ var versionGetCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.GetVersion(c, projectID, resourceID)
+		data, err := project.GetVersion(c, projectID, resourceID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 var versionCreateCmd = &cobra.Command{
@@ -1020,7 +1295,16 @@ var versionCreateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.CreateVersion(c, projectID, name, startDate, releaseDate, assignee, stageID)
+		data, err := project.CreateVersion(c, projectID, name, startDate, releaseDate, assignee, stageID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 var versionUpdateCmd = &cobra.Command{
@@ -1031,7 +1315,16 @@ var versionUpdateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.UpdateVersion(c, projectID, resourceID, name, startDate, releaseDate, assignee, stageID)
+		data, err := project.UpdateVersion(c, projectID, resourceID, name, startDate, releaseDate, assignee, stageID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 var versionDeleteCmd = &cobra.Command{
@@ -1042,7 +1335,12 @@ var versionDeleteCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.DeleteVersion(c, projectID, resourceID)
+		err = project.DeleteVersion(c, projectID, resourceID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		output.FormatAndPrint(map[string]string{"message": "Deleted version", "id": resourceID}, opts)
 	},
 }
 
@@ -1055,7 +1353,16 @@ var kanbanListCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.ListKanbans(c, projectID)
+		data, err := project.ListKanbans(c, projectID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMapSlice(data), opts)
+		}
 	},
 }
 var kanbanGetCmd = &cobra.Command{
@@ -1066,7 +1373,16 @@ var kanbanGetCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.GetKanban(c, resourceID)
+		data, err := project.GetKanban(c, resourceID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 var kanbanCreateCmd = &cobra.Command{
@@ -1077,7 +1393,16 @@ var kanbanCreateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.CreateKanban(c, projectID, name)
+		data, err := project.CreateKanban(c, projectID, name)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 var kanbanUpdateCmd = &cobra.Command{
@@ -1088,7 +1413,16 @@ var kanbanUpdateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.UpdateKanban(c, resourceID, name)
+		data, err := project.UpdateKanban(c, resourceID, name)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 var kanbanDeleteCmd = &cobra.Command{
@@ -1099,7 +1433,12 @@ var kanbanDeleteCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.DeleteKanban(c, resourceID)
+		err = project.DeleteKanban(c, resourceID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		output.FormatAndPrint(map[string]string{"message": "Deleted kanban", "id": resourceID}, opts)
 	},
 }
 var kanbanEntriesCmd = &cobra.Command{
@@ -1110,7 +1449,16 @@ var kanbanEntriesCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.ListKanbanEntries(c, projectID, boardID)
+		data, err := project.ListKanbanEntries(c, projectID, boardID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMapSlice(data), opts)
+		}
 	},
 }
 var severitiesCmd = &cobra.Command{
@@ -1121,7 +1469,16 @@ var severitiesCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.ListSeverities(c)
+		data, err := project.ListSeverities(c)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMapSlice(data), opts)
+		}
 	},
 }
 
@@ -1133,7 +1490,16 @@ var typesCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.ListWorkItemTypes(c)
+		data, err := project.ListWorkItemTypes(c)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMapSlice(data), opts)
+		}
 	},
 }
 
@@ -1145,7 +1511,16 @@ var prioritiesCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.ListPriorities(c, projectID)
+		data, err := project.ListPriorities(c, projectID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMapSlice(data), opts)
+		}
 	},
 }
 
@@ -1162,7 +1537,16 @@ var tagsListCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.ListTags(c)
+		data, err := project.ListTags(c)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMapSlice(data), opts)
+		}
 	},
 }
 
@@ -1174,7 +1558,16 @@ var tagsCreateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.CreateWorkItemTag(c, name)
+		data, err := project.CreateWorkItemTag(c, name)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 
@@ -1186,7 +1579,16 @@ var propertiesCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.ListProperties(c, projectID, typeID)
+		data, err := project.ListProperties(c, projectID, typeID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMapSlice(data), opts)
+		}
 	},
 }
 
@@ -1198,7 +1600,16 @@ var membersCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.ListProjectMembers(c, projectID)
+		data, err := project.ListProjectMembers(c, projectID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMapSlice(data), opts)
+		}
 	},
 }
 
@@ -1210,7 +1621,16 @@ var statusesCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		project.ListStatuses(c)
+		data, err := project.ListStatuses(c)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMapSlice(data), opts)
+		}
 	},
 }
 
@@ -1226,7 +1646,16 @@ c, err := GetClient()
 if err != nil {
 log.Fatal(err)
 }
-project.ListSwimlanes(c, projectID, boardID)
+data, err := project.ListSwimlanes(c, projectID, boardID)
+if err != nil {
+log.Fatal(err)
+}
+opts := GetOutputOptions()
+if opts.Raw {
+output.FormatAndPrint(data, opts)
+} else {
+output.FormatAndPrint(toMapSlice(data), opts)
+}
 },
 }
 
@@ -1238,7 +1667,16 @@ c, err := GetClient()
 if err != nil {
 log.Fatal(err)
 }
-project.CreateSwimlane(c, projectID, boardID, name)
+data, err := project.CreateSwimlane(c, projectID, boardID, name)
+if err != nil {
+log.Fatal(err)
+}
+opts := GetOutputOptions()
+if opts.Raw {
+output.FormatAndPrint(data, opts)
+} else {
+output.FormatAndPrint(toMap(data), opts)
+}
 },
 }
 
@@ -1250,7 +1688,16 @@ c, err := GetClient()
 if err != nil {
 log.Fatal(err)
 }
-project.UpdateSwimlane(c, projectID, boardID, resourceID, name)
+data, err := project.UpdateSwimlane(c, projectID, boardID, resourceID, name)
+if err != nil {
+log.Fatal(err)
+}
+opts := GetOutputOptions()
+if opts.Raw {
+output.FormatAndPrint(data, opts)
+} else {
+output.FormatAndPrint(toMap(data), opts)
+}
 },
 }
 
@@ -1262,7 +1709,12 @@ c, err := GetClient()
 if err != nil {
 log.Fatal(err)
 }
-project.DeleteSwimlane(c, projectID, boardID, resourceID)
+err = project.DeleteSwimlane(c, projectID, boardID, resourceID)
+if err != nil {
+log.Fatal(err)
+}
+opts := GetOutputOptions()
+output.FormatAndPrint(map[string]string{"message": "Deleted swimlane", "id": resourceID}, opts)
 },
 }
 
@@ -1278,7 +1730,16 @@ c, err := GetClient()
 if err != nil {
 log.Fatal(err)
 }
-project.CreateKanbanEntry(c, projectID, boardID, name, wipLimit, isSplit, dod)
+data, err := project.CreateKanbanEntry(c, projectID, boardID, name, wipLimit, isSplit, dod)
+if err != nil {
+log.Fatal(err)
+}
+opts := GetOutputOptions()
+if opts.Raw {
+output.FormatAndPrint(data, opts)
+} else {
+output.FormatAndPrint(toMap(data), opts)
+}
 },
 }
 
@@ -1290,7 +1751,16 @@ c, err := GetClient()
 if err != nil {
 log.Fatal(err)
 }
-project.UpdateKanbanEntry(c, projectID, boardID, resourceID, name, wipLimit, isSplit, dod)
+data, err := project.UpdateKanbanEntry(c, projectID, boardID, resourceID, name, wipLimit, isSplit, dod)
+if err != nil {
+log.Fatal(err)
+}
+opts := GetOutputOptions()
+if opts.Raw {
+output.FormatAndPrint(data, opts)
+} else {
+output.FormatAndPrint(toMap(data), opts)
+}
 },
 }
 
@@ -1302,7 +1772,12 @@ c, err := GetClient()
 if err != nil {
 log.Fatal(err)
 }
-project.DeleteKanbanEntry(c, projectID, boardID, resourceID)
+err = project.DeleteKanbanEntry(c, projectID, boardID, resourceID)
+if err != nil {
+log.Fatal(err)
+}
+opts := GetOutputOptions()
+output.FormatAndPrint(map[string]string{"message": "Deleted entry", "id": resourceID}, opts)
 },
 }
 
@@ -1318,7 +1793,16 @@ c, err := GetClient()
 if err != nil {
 log.Fatal(err)
 }
-project.ListProjectMembers(c, projectID)
+data, err := project.ListProjectMembers(c, projectID)
+if err != nil {
+log.Fatal(err)
+}
+opts := GetOutputOptions()
+if opts.Raw {
+output.FormatAndPrint(data, opts)
+} else {
+output.FormatAndPrint(toMapSlice(data), opts)
+}
 },
 }
 
@@ -1330,7 +1814,16 @@ c, err := GetClient()
 if err != nil {
 log.Fatal(err)
 }
-project.AddProjectMember(c, projectID, memberID, memberType, roleID)
+data, err := project.AddProjectMember(c, projectID, memberID, memberType, roleID)
+if err != nil {
+log.Fatal(err)
+}
+opts := GetOutputOptions()
+if opts.Raw {
+output.FormatAndPrint(data, opts)
+} else {
+output.FormatAndPrint(toMap(data), opts)
+}
 },
 }
 
@@ -1342,7 +1835,12 @@ c, err := GetClient()
 if err != nil {
 log.Fatal(err)
 }
-project.RemoveProjectMember(c, projectID, memberID)
+err = project.RemoveProjectMember(c, projectID, memberID)
+if err != nil {
+log.Fatal(err)
+}
+opts := GetOutputOptions()
+output.FormatAndPrint(map[string]string{"message": "Removed member", "member_id": memberID}, opts)
 },
 }
 
@@ -1354,7 +1852,16 @@ c, err := GetClient()
 if err != nil {
 log.Fatal(err)
 }
-project.UpdateProjectMember(c, projectID, memberID, roleID)
+data, err := project.UpdateProjectMember(c, projectID, memberID, roleID)
+if err != nil {
+log.Fatal(err)
+}
+opts := GetOutputOptions()
+if opts.Raw {
+output.FormatAndPrint(data, opts)
+} else {
+output.FormatAndPrint(toMap(data), opts)
+}
 },
 }
 
@@ -1370,7 +1877,16 @@ c, err := GetClient()
 if err != nil {
 log.Fatal(err)
 }
-project.ListWorkItemParticipants(c, resourceID)
+data, err := project.ListWorkItemParticipants(c, resourceID)
+if err != nil {
+log.Fatal(err)
+}
+opts := GetOutputOptions()
+if opts.Raw {
+output.FormatAndPrint(data, opts)
+} else {
+output.FormatAndPrint(toMapSlice(data), opts)
+}
 },
 }
 
@@ -1382,7 +1898,16 @@ c, err := GetClient()
 if err != nil {
 log.Fatal(err)
 }
-project.AddWorkItemParticipant(c, resourceID, userID)
+data, err := project.AddWorkItemParticipant(c, resourceID, userID)
+if err != nil {
+log.Fatal(err)
+}
+opts := GetOutputOptions()
+if opts.Raw {
+output.FormatAndPrint(data, opts)
+} else {
+output.FormatAndPrint(toMap(data), opts)
+}
 },
 }
 
@@ -1394,7 +1919,12 @@ c, err := GetClient()
 if err != nil {
 log.Fatal(err)
 }
-project.RemoveWorkItemParticipant(c, resourceID, participantID)
+err = project.RemoveWorkItemParticipant(c, resourceID, participantID)
+if err != nil {
+log.Fatal(err)
+}
+opts := GetOutputOptions()
+output.FormatAndPrint(map[string]string{"message": "Removed participant", "participant_id": participantID}, opts)
 },
 }
 
@@ -1410,7 +1940,16 @@ c, err := GetClient()
 if err != nil {
 log.Fatal(err)
 }
-project.ListWorkItemRelations(c, resourceID)
+data, err := project.ListWorkItemRelations(c, resourceID)
+if err != nil {
+log.Fatal(err)
+}
+opts := GetOutputOptions()
+if opts.Raw {
+output.FormatAndPrint(data, opts)
+} else {
+output.FormatAndPrint(toMapSlice(data), opts)
+}
 },
 }
 
@@ -1422,7 +1961,16 @@ c, err := GetClient()
 if err != nil {
 log.Fatal(err)
 }
-project.AddWorkItemRelation(c, resourceID, targetID, relType)
+data, err := project.AddWorkItemRelation(c, resourceID, targetID, relType)
+if err != nil {
+log.Fatal(err)
+}
+opts := GetOutputOptions()
+if opts.Raw {
+output.FormatAndPrint(data, opts)
+} else {
+output.FormatAndPrint(toMap(data), opts)
+}
 },
 }
 
@@ -1434,7 +1982,12 @@ c, err := GetClient()
 if err != nil {
 log.Fatal(err)
 }
-project.RemoveWorkItemRelation(c, resourceID, relationID)
+err = project.RemoveWorkItemRelation(c, resourceID, relationID)
+if err != nil {
+log.Fatal(err)
+}
+opts := GetOutputOptions()
+output.FormatAndPrint(map[string]string{"message": "Removed relation", "relation_id": relationID}, opts)
 },
 }
 
@@ -1448,6 +2001,15 @@ c, err := GetClient()
 if err != nil {
 log.Fatal(err)
 }
-project.ListWorkItemTransitionHistories(c, resourceID)
+data, err := project.ListWorkItemTransitionHistories(c, resourceID)
+if err != nil {
+log.Fatal(err)
+}
+opts := GetOutputOptions()
+if opts.Raw {
+output.FormatAndPrint(data, opts)
+} else {
+output.FormatAndPrint(toMapSlice(data), opts)
+}
 },
 }
