@@ -1,8 +1,11 @@
 package cmd
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 	"pingcode-client/internal/app/ship"
+	"pingcode-client/internal/pkg/output"
 	"pingcode-client/internal/pkg/sdk"
 
 	"github.com/spf13/cobra"
@@ -50,6 +53,22 @@ var (
 	keywords   string
 )
 
+// toMap converts a struct to map[string]interface{} using JSON serialization
+func toMap(v interface{}) map[string]interface{} {
+	b, _ := json.Marshal(v)
+	var m map[string]interface{}
+	json.Unmarshal(b, &m)
+	return m
+}
+
+// toMapSlice converts a slice of structs to []map[string]interface{}
+func toMapSlice(v interface{}) []map[string]interface{} {
+	b, _ := json.Marshal(v)
+	var m []map[string]interface{}
+	json.Unmarshal(b, &m)
+	return m
+}
+
 var productCmd = &cobra.Command{
 	Use:   "product",
 	Short: "产品管理",
@@ -61,9 +80,23 @@ var listProductsCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := GetClient()
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
-		ship.ListProducts(client)
+		data, err := ship.ListProducts(client)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			if err := output.FormatAndPrint(data, opts); err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			simplified := toMapSlice(data)
+			if err := output.FormatAndPrint(simplified, opts); err != nil {
+				log.Fatal(err)
+			}
+		}
 	},
 }
 
@@ -73,13 +106,26 @@ var createProductCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := GetClient()
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
-		ship.CreateProduct(client, &sdk.Product{
+		data, err := ship.CreateProduct(client, &sdk.Product{
 			Name:        pName,
 			Identifier:  pIdentifier,
 			Description: pDescription,
 		})
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			if err := output.FormatAndPrint(data, opts); err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			if err := output.FormatAndPrint(toMap(data), opts); err != nil {
+				log.Fatal(err)
+			}
+		}
 	},
 }
 
@@ -89,13 +135,26 @@ var updateProductCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := GetClient()
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
-		ship.UpdateProduct(client, productID, &sdk.Product{
+		data, err := ship.UpdateProduct(client, productID, &sdk.Product{
 			Name:        pName,
 			Identifier:  pIdentifier,
 			Description: pDescription,
 		})
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			if err := output.FormatAndPrint(data, opts); err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			if err := output.FormatAndPrint(toMap(data), opts); err != nil {
+				log.Fatal(err)
+			}
+		}
 	},
 }
 
@@ -110,9 +169,23 @@ var listProductMembersCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := GetClient()
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
-		ship.ListProductMembers(client, productID)
+		data, err := ship.ListProductMembers(client, productID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			if err := output.FormatAndPrint(data, opts); err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			simplified := toMapSlice(data)
+			if err := output.FormatAndPrint(simplified, opts); err != nil {
+				log.Fatal(err)
+			}
+		}
 	},
 }
 
@@ -122,9 +195,22 @@ var addProductMemberCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := GetClient()
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
-		ship.AddProductMember(client, productID, pMemberID, pMemberType, pRoleID)
+		data, err := ship.AddProductMember(client, productID, pMemberID, pMemberType, pRoleID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			if err := output.FormatAndPrint(data, opts); err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			if err := output.FormatAndPrint(toMap(data), opts); err != nil {
+				log.Fatal(err)
+			}
+		}
 	},
 }
 
@@ -134,9 +220,13 @@ var removeProductMemberCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := GetClient()
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
-		ship.RemoveProductMember(client, productID, pMemberID)
+		err = ship.RemoveProductMember(client, productID, pMemberID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println("Member removed successfully")
 	},
 }
 
@@ -151,9 +241,23 @@ var listProductModulesCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := GetClient()
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
-		ship.ListProductSuites(client, productID)
+		data, err := ship.ListProductSuites(client, productID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			if err := output.FormatAndPrint(data, opts); err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			simplified := toMapSlice(data)
+			if err := output.FormatAndPrint(simplified, opts); err != nil {
+				log.Fatal(err)
+			}
+		}
 	},
 }
 
@@ -163,13 +267,26 @@ var addProductModuleCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := GetClient()
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
-		ship.AddProductSuite(client, productID, &sdk.IdeaSuite{
+		data, err := ship.AddProductSuite(client, productID, &sdk.IdeaSuite{
 			Name:     pName,
 			Type:     pSuiteType,
 			ParentID: pParentID,
 		})
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			if err := output.FormatAndPrint(data, opts); err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			if err := output.FormatAndPrint(toMap(data), opts); err != nil {
+				log.Fatal(err)
+			}
+		}
 	},
 }
 
@@ -179,9 +296,13 @@ var removeProductModuleCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := GetClient()
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
-		ship.RemoveProductSuite(client, productID, suiteID)
+		err = ship.RemoveProductSuite(client, productID, suiteID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println("Suite removed successfully")
 	},
 }
 
@@ -191,9 +312,23 @@ var listProductPlansCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := GetClient()
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
-		ship.ListProductPlans(client, productID)
+		data, err := ship.ListProductPlans(client, productID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			if err := output.FormatAndPrint(data, opts); err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			simplified := toMapSlice(data)
+			if err := output.FormatAndPrint(simplified, opts); err != nil {
+				log.Fatal(err)
+			}
+		}
 	},
 }
 
@@ -203,9 +338,23 @@ var listProductChannelsCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := GetClient()
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
-		ship.ListProductChannels(client, productID)
+		data, err := ship.ListProductChannels(client, productID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			if err := output.FormatAndPrint(data, opts); err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			simplified := toMapSlice(data)
+			if err := output.FormatAndPrint(simplified, opts); err != nil {
+				log.Fatal(err)
+			}
+		}
 	},
 }
 
@@ -215,9 +364,23 @@ var listProductTicketTypesCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := GetClient()
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
-		ship.ListProductTicketTypes(client, productID)
+		data, err := ship.ListProductTicketTypes(client, productID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			if err := output.FormatAndPrint(data, opts); err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			simplified := toMapSlice(data)
+			if err := output.FormatAndPrint(simplified, opts); err != nil {
+				log.Fatal(err)
+			}
+		}
 	},
 }
 
@@ -232,9 +395,23 @@ var listProductTagsCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := GetClient()
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
-		ship.ListProductTags(client, productID)
+		data, err := ship.ListProductTags(client, productID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			if err := output.FormatAndPrint(data, opts); err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			simplified := toMapSlice(data)
+			if err := output.FormatAndPrint(simplified, opts); err != nil {
+				log.Fatal(err)
+			}
+		}
 	},
 }
 
@@ -244,9 +421,22 @@ var addProductTagCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := GetClient()
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
-		ship.AddProductTag(client, productID, pTagName)
+		data, err := ship.AddProductTag(client, productID, pTagName)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			if err := output.FormatAndPrint(data, opts); err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			if err := output.FormatAndPrint(toMap(data), opts); err != nil {
+				log.Fatal(err)
+			}
+		}
 	},
 }
 
@@ -256,9 +446,13 @@ var removeProductTagCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := GetClient()
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
-		ship.RemoveProductTag(client, productID, pTagID)
+		err = ship.RemoveProductTag(client, productID, pTagID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println("Tag removed successfully")
 	},
 }
 
@@ -273,9 +467,23 @@ var listIdeasCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := GetClient()
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
-		ship.ListIdeas(client, productID)
+		data, err := ship.ListIdeas(client, productID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			if err := output.FormatAndPrint(data, opts); err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			simplified := toMapSlice(data)
+			if err := output.FormatAndPrint(simplified, opts); err != nil {
+				log.Fatal(err)
+			}
+		}
 	},
 }
 
@@ -285,9 +493,9 @@ var createIdeaCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := GetClient()
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
-		ship.CreateIdea(client, &sdk.Idea{
+		data, err := ship.CreateIdea(client, &sdk.Idea{
 			ProductID:   productID,
 			Title:       title,
 			Description: desc,
@@ -295,6 +503,19 @@ var createIdeaCmd = &cobra.Command{
 			SuiteID:     suiteID,
 			PriorityID:  priorityID,
 		})
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			if err := output.FormatAndPrint(data, opts); err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			if err := output.FormatAndPrint(toMap(data), opts); err != nil {
+				log.Fatal(err)
+			}
+		}
 	},
 }
 
@@ -304,9 +525,9 @@ var updateIdeaCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := GetClient()
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
-		ship.UpdateIdea(client, ideaID, &sdk.Idea{
+		data, err := ship.UpdateIdea(client, ideaID, &sdk.Idea{
 			Title:       title,
 			Description: desc,
 			StateID:     stateID,
@@ -315,6 +536,19 @@ var updateIdeaCmd = &cobra.Command{
 			SuiteID:     suiteID,
 			PlanID:      planID,
 		})
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			if err := output.FormatAndPrint(data, opts); err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			if err := output.FormatAndPrint(toMap(data), opts); err != nil {
+				log.Fatal(err)
+			}
+		}
 	},
 }
 
@@ -324,9 +558,23 @@ var listStatesCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := GetClient()
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
-		ship.ListIdeaStates(client, productID)
+		data, err := ship.ListIdeaStates(client, productID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			if err := output.FormatAndPrint(data, opts); err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			simplified := toMapSlice(data)
+			if err := output.FormatAndPrint(simplified, opts); err != nil {
+				log.Fatal(err)
+			}
+		}
 	},
 }
 
@@ -336,9 +584,23 @@ var listPrioritiesCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := GetClient()
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
-		ship.ListIdeaPriorities(client, productID)
+		data, err := ship.ListIdeaPriorities(client, productID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			if err := output.FormatAndPrint(data, opts); err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			simplified := toMapSlice(data)
+			if err := output.FormatAndPrint(simplified, opts); err != nil {
+				log.Fatal(err)
+			}
+		}
 	},
 }
 
@@ -348,9 +610,23 @@ var listPropertiesCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := GetClient()
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
-		ship.ListIdeaProperties(client, productID)
+		data, err := ship.ListIdeaProperties(client, productID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			if err := output.FormatAndPrint(data, opts); err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			simplified := toMapSlice(data)
+			if err := output.FormatAndPrint(simplified, opts); err != nil {
+				log.Fatal(err)
+			}
+		}
 	},
 }
 
@@ -360,9 +636,23 @@ var listSuitesCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := GetClient()
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
-		ship.ListIdeaSuites(client, productID)
+		data, err := ship.ListIdeaSuites(client, productID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			if err := output.FormatAndPrint(data, opts); err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			simplified := toMapSlice(data)
+			if err := output.FormatAndPrint(simplified, opts); err != nil {
+				log.Fatal(err)
+			}
+		}
 	},
 }
 
@@ -372,9 +662,23 @@ var listPlansCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := GetClient()
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
-		ship.ListIdeaPlans(client, productID)
+		data, err := ship.ListIdeaPlans(client, productID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			if err := output.FormatAndPrint(data, opts); err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			simplified := toMapSlice(data)
+			if err := output.FormatAndPrint(simplified, opts); err != nil {
+				log.Fatal(err)
+			}
+		}
 	},
 }
 
@@ -384,9 +688,178 @@ var listHistoriesCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := GetClient()
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
-		ship.ListIdeaTransitionHistories(client, ideaID)
+		data, err := ship.ListIdeaTransitionHistories(client, ideaID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			if err := output.FormatAndPrint(data, opts); err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			simplified := toMapSlice(data)
+			if err := output.FormatAndPrint(simplified, opts); err != nil {
+				log.Fatal(err)
+			}
+		}
+	},
+}
+
+var ticketsCmd = &cobra.Command{Use: "tickets", Short: "工单管理"}
+
+var listTicketsCmd = &cobra.Command{
+	Use:   "list",
+	Short: "获取工单列表",
+	Run: func(cmd *cobra.Command, args []string) {
+		client, err := GetClient()
+		if err != nil {
+			log.Fatal(err)
+		}
+		data, err := ship.ListTickets(client, productID, typeID, stateID, priorityID, keywords)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			if err := output.FormatAndPrint(data, opts); err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			simplified := toMapSlice(data)
+			if err := output.FormatAndPrint(simplified, opts); err != nil {
+				log.Fatal(err)
+			}
+		}
+	},
+}
+
+var getTicketCmd = &cobra.Command{
+	Use:   "get",
+	Short: "获取工单详情",
+	Run: func(cmd *cobra.Command, args []string) {
+		client, err := GetClient()
+		if err != nil {
+			log.Fatal(err)
+		}
+		data, err := ship.GetTicket(client, ticketID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			if err := output.FormatAndPrint(data, opts); err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			if err := output.FormatAndPrint(toMap(data), opts); err != nil {
+				log.Fatal(err)
+			}
+		}
+	},
+}
+
+var createTicketCmd = &cobra.Command{
+	Use:   "create",
+	Short: "创建工单",
+	Run: func(cmd *cobra.Command, args []string) {
+		client, err := GetClient()
+		if err != nil {
+			log.Fatal(err)
+		}
+		data, err := ship.CreateTicket(client, productID, title, desc, typeID, assigneeID, priorityID, channelID, customerID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			if err := output.FormatAndPrint(data, opts); err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			if err := output.FormatAndPrint(toMap(data), opts); err != nil {
+				log.Fatal(err)
+			}
+		}
+	},
+}
+
+var updateTicketCmd = &cobra.Command{
+	Use:   "update",
+	Short: "更新工单",
+	Run: func(cmd *cobra.Command, args []string) {
+		client, err := GetClient()
+		if err != nil {
+			log.Fatal(err)
+		}
+		data, err := ship.UpdateTicket(client, ticketID, title, desc, typeID, stateID, assigneeID, priorityID, solutionID, customerID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			if err := output.FormatAndPrint(data, opts); err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			if err := output.FormatAndPrint(toMap(data), opts); err != nil {
+				log.Fatal(err)
+			}
+		}
+	},
+}
+
+var listTicketPrioritiesCmd = &cobra.Command{
+	Use:   "priorities",
+	Short: "获取工单优先级列表",
+	Run: func(cmd *cobra.Command, args []string) {
+		client, err := GetClient()
+		if err != nil {
+			log.Fatal(err)
+		}
+		data, err := ship.ListTicketPriorities(client, productID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			if err := output.FormatAndPrint(data, opts); err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			simplified := toMapSlice(data)
+			if err := output.FormatAndPrint(simplified, opts); err != nil {
+				log.Fatal(err)
+			}
+		}
+	},
+}
+
+var listTicketStatesCmd = &cobra.Command{
+	Use:   "states",
+	Short: "获取工单状态列表",
+	Run: func(cmd *cobra.Command, args []string) {
+		client, err := GetClient()
+		if err != nil {
+			log.Fatal(err)
+		}
+		data, err := ship.ListTicketStates(client, productID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			if err := output.FormatAndPrint(data, opts); err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			simplified := toMapSlice(data)
+			if err := output.FormatAndPrint(simplified, opts); err != nil {
+				log.Fatal(err)
+			}
+		}
 	},
 }
 
@@ -506,84 +979,8 @@ func init() {
 	updateTicketCmd.Flags().StringVar(&typeID, "type-id", "", "工单类型 ID")
 	updateTicketCmd.Flags().StringVar(&stateID, "state-id", "", "工单状态 ID")
 	updateTicketCmd.Flags().StringVar(&assigneeID, "assignee-id", "", "负责人 ID")
-	updateTicketCmd.Flags().StringVar(&priorityID, "priority-id", "", "优先级 ID")
+	updateTicketCmd.Flags().StringVar(&priorityID, "priority-id", "", "工单优先级 ID")
 	updateTicketCmd.Flags().StringVar(&solutionID, "solution-id", "", "解决方案 ID")
 	updateTicketCmd.Flags().StringVar(&customerID, "customer-id", "", "客户 ID")
 	updateTicketCmd.MarkFlagRequired("id")
-}
-
-// ── Ticket commands ────────────────────────────────────────────────────────
-
-var ticketsCmd = &cobra.Command{Use: "tickets", Short: "工单管理"}
-
-var listTicketsCmd = &cobra.Command{
-Use:   "list",
-Short: "获取工单列表",
-Run: func(cmd *cobra.Command, args []string) {
-client, err := GetClient()
-if err != nil {
-log.Fatal(err)
-}
-ship.ListTickets(client, productID, typeID, stateID, priorityID, keywords)
-},
-}
-
-var getTicketCmd = &cobra.Command{
-Use:   "get",
-Short: "获取工单详情",
-Run: func(cmd *cobra.Command, args []string) {
-client, err := GetClient()
-if err != nil {
-log.Fatal(err)
-}
-ship.GetTicket(client, ticketID)
-},
-}
-
-var createTicketCmd = &cobra.Command{
-Use:   "create",
-Short: "创建工单",
-Run: func(cmd *cobra.Command, args []string) {
-client, err := GetClient()
-if err != nil {
-log.Fatal(err)
-}
-ship.CreateTicket(client, productID, title, desc, typeID, assigneeID, priorityID, channelID, customerID)
-},
-}
-
-var updateTicketCmd = &cobra.Command{
-Use:   "update",
-Short: "更新工单",
-Run: func(cmd *cobra.Command, args []string) {
-client, err := GetClient()
-if err != nil {
-log.Fatal(err)
-}
-ship.UpdateTicket(client, ticketID, title, desc, typeID, stateID, assigneeID, priorityID, solutionID, customerID)
-},
-}
-
-var listTicketPrioritiesCmd = &cobra.Command{
-Use:   "priorities",
-Short: "获取工单优先级列表",
-Run: func(cmd *cobra.Command, args []string) {
-client, err := GetClient()
-if err != nil {
-log.Fatal(err)
-}
-ship.ListTicketPriorities(client, productID)
-},
-}
-
-var listTicketStatesCmd = &cobra.Command{
-Use:   "states",
-Short: "获取工单状态列表",
-Run: func(cmd *cobra.Command, args []string) {
-client, err := GetClient()
-if err != nil {
-log.Fatal(err)
-}
-ship.ListTicketStates(client, productID)
-},
 }

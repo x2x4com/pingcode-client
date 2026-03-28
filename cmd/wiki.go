@@ -3,6 +3,7 @@ package cmd
 import (
 	"log"
 	"pingcode-client/internal/app/wiki"
+	"pingcode-client/internal/pkg/output"
 
 	"github.com/spf13/cobra"
 )
@@ -51,7 +52,16 @@ var wikiSpaceListCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to get client: %v", err)
 		}
-		wiki.ListSpaces(c)
+		data, err := wiki.ListSpaces(c)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMapSlice(data), opts)
+		}
 	},
 }
 
@@ -63,7 +73,16 @@ var wikiSpaceGetCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to get client: %v", err)
 		}
-		wiki.GetSpace(c, wikiSpaceID)
+		data, err := wiki.GetSpace(c, wikiSpaceID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 
@@ -75,7 +94,16 @@ var wikiSpaceCreateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to get client: %v", err)
 		}
-		wiki.CreateSpace(c, wikiName, wikiIdentifier, wikiScopeType, wikiScopeID, wikiVisibility, wikiDesc)
+		data, err := wiki.CreateSpace(c, wikiName, wikiIdentifier, wikiScopeType, wikiScopeID, wikiVisibility, wikiDesc)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 
@@ -87,7 +115,16 @@ var wikiSpaceUpdateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to get client: %v", err)
 		}
-		wiki.UpdateSpace(c, wikiSpaceID, wikiName, wikiVisibility, wikiDesc)
+		data, err := wiki.UpdateSpace(c, wikiSpaceID, wikiName, wikiVisibility, wikiDesc)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 
@@ -99,7 +136,12 @@ var wikiSpaceDeleteCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to get client: %v", err)
 		}
-		wiki.DeleteSpace(c, wikiSpaceID)
+		err = wiki.DeleteSpace(c, wikiSpaceID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		output.FormatAndPrint(map[string]string{"message": "Deleted space", "id": wikiSpaceID}, opts)
 	},
 }
 
@@ -118,7 +160,16 @@ var wikiSpaceMemberListCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to get client: %v", err)
 		}
-		wiki.ListSpaceMembers(c, wikiSpaceID)
+		data, err := wiki.ListSpaceMembers(c, wikiSpaceID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMapSlice(data), opts)
+		}
 	},
 }
 
@@ -130,7 +181,16 @@ var wikiSpaceMemberAddCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to get client: %v", err)
 		}
-		wiki.AddSpaceMember(c, wikiSpaceID, wikiMemberID, wikiMemberType, wikiRoleID)
+		data, err := wiki.AddSpaceMember(c, wikiSpaceID, wikiMemberID, wikiMemberType, wikiRoleID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 
@@ -142,7 +202,12 @@ var wikiSpaceMemberRemoveCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to get client: %v", err)
 		}
-		wiki.RemoveSpaceMember(c, wikiSpaceID, wikiMemberID)
+		err = wiki.RemoveSpaceMember(c, wikiSpaceID, wikiMemberID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		output.FormatAndPrint(map[string]string{"message": "Removed member", "member_id": wikiMemberID}, opts)
 	},
 }
 
@@ -161,7 +226,16 @@ var wikiPageListCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to get client: %v", err)
 		}
-		wiki.ListPages(c, wikiSpaceIDFlag)
+		data, err := wiki.ListPages(c, wikiSpaceIDFlag)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMapSlice(data), opts)
+		}
 	},
 }
 
@@ -173,7 +247,16 @@ var wikiPageGetCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to get client: %v", err)
 		}
-		wiki.GetPage(c, wikiPageID)
+		data, err := wiki.GetPage(c, wikiPageID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 
@@ -185,7 +268,16 @@ var wikiPageCreateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to get client: %v", err)
 		}
-		wiki.CreatePage(c, wikiSpaceIDFlag, wikiParentID, wikiTitle, wikiPageType)
+		data, err := wiki.CreatePage(c, wikiSpaceIDFlag, wikiParentID, wikiTitle, wikiPageType)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 
@@ -197,7 +289,16 @@ var wikiPageUpdateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to get client: %v", err)
 		}
-		wiki.UpdatePage(c, wikiPageID, wikiTitle)
+		data, err := wiki.UpdatePage(c, wikiPageID, wikiTitle)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 
@@ -209,7 +310,12 @@ var wikiPageDeleteCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to get client: %v", err)
 		}
-		wiki.DeletePage(c, wikiPageID)
+		err = wiki.DeletePage(c, wikiPageID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		output.FormatAndPrint(map[string]string{"message": "Deleted page", "id": wikiPageID}, opts)
 	},
 }
 
@@ -228,7 +334,16 @@ var wikiPageContentGetCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to get client: %v", err)
 		}
-		wiki.GetPageContent(c, wikiPageID)
+		data, err := wiki.GetPageContent(c, wikiPageID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 
@@ -240,7 +355,16 @@ var wikiPageContentUpdateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to get client: %v", err)
 		}
-		wiki.UpdatePageContent(c, wikiPageID, wikiContent, wikiFormat)
+		data, err := wiki.UpdatePageContent(c, wikiPageID, wikiContent, wikiFormat)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 
@@ -252,7 +376,16 @@ var wikiPageVersionsCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to get client: %v", err)
 		}
-		wiki.ListPageVersions(c, wikiPageID)
+		data, err := wiki.ListPageVersions(c, wikiPageID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMapSlice(data), opts)
+		}
 	},
 }
 

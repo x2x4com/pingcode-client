@@ -5,6 +5,7 @@ import (
 	"os"
 	"pingcode-client/info"
 	"pingcode-client/internal/app"
+	"pingcode-client/internal/pkg/output"
 
 	"pingcode-client/internal/pkg/sdk"
 
@@ -15,6 +16,8 @@ var (
 	clientID     string
 	clientSecret string
 	pcClient     *sdk.Client
+	outputFormat string
+	rawOutput    bool
 )
 
 var rootCmd = &cobra.Command{
@@ -47,6 +50,8 @@ func Execute() {
 func init() {
 	rootCmd.PersistentFlags().StringVar(&clientID, "client-id", "", "PingCode Client ID (env: PINGCODE_CLIENT_ID)")
 	rootCmd.PersistentFlags().StringVar(&clientSecret, "client-secret", "", "PingCode Client Secret (env: PINGCODE_CLIENT_SECRET)")
+	rootCmd.PersistentFlags().StringVar(&outputFormat, "output", "table", "Output format: json, yaml, markdown, table")
+	rootCmd.PersistentFlags().BoolVar(&rawOutput, "raw", false, "Output raw data without formatting")
 }
 
 func GetClient() (*sdk.Client, error) {
@@ -54,4 +59,11 @@ func GetClient() (*sdk.Client, error) {
 		return nil, fmt.Errorf("client not initialized. Please provide client-id and client-secret via flags or environment variables")
 	}
 	return pcClient, nil
+}
+
+func GetOutputOptions() output.Options {
+	return output.Options{
+		Format: output.Format(outputFormat),
+		Raw:    rawOutput,
+	}
 }

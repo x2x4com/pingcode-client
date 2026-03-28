@@ -3,6 +3,7 @@ package cmd
 import (
 	"log"
 	"pingcode-client/internal/app/testhub"
+	"pingcode-client/internal/pkg/output"
 
 	"github.com/spf13/cobra"
 )
@@ -54,7 +55,16 @@ var thLibraryListCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to get client: %v", err)
 		}
-		testhub.ListLibraries(c)
+		data, err := testhub.ListLibraries(c)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMapSlice(data), opts)
+		}
 	},
 }
 
@@ -66,7 +76,16 @@ var thLibraryCreateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to get client: %v", err)
 		}
-		testhub.CreateLibrary(c, thName, thIdentifier, thScopeType, thScopeID, thVisibility, thDesc)
+		data, err := testhub.CreateLibrary(c, thName, thIdentifier, thScopeType, thScopeID, thVisibility, thDesc)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 
@@ -78,7 +97,16 @@ var thLibraryUpdateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to get client: %v", err)
 		}
-		testhub.UpdateLibrary(c, thLibraryID, thName, thVisibility, thDesc)
+		data, err := testhub.UpdateLibrary(c, thLibraryID, thName, thVisibility, thDesc)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 
@@ -98,7 +126,16 @@ var thMemberListCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to get client: %v", err)
 		}
-		testhub.ListLibraryMembers(c, thLibraryID)
+		data, err := testhub.ListLibraryMembers(c, thLibraryID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMapSlice(data), opts)
+		}
 	},
 }
 
@@ -110,7 +147,16 @@ var thMemberAddCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to get client: %v", err)
 		}
-		testhub.AddLibraryMember(c, thLibraryID, thMemberID, thMemberType, thRoleID)
+		data, err := testhub.AddLibraryMember(c, thLibraryID, thMemberID, thMemberType, thRoleID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 
@@ -122,7 +168,12 @@ var thMemberRemoveCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to get client: %v", err)
 		}
-		testhub.RemoveLibraryMember(c, thLibraryID, thMemberID)
+		err = testhub.RemoveLibraryMember(c, thLibraryID, thMemberID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		output.FormatAndPrint(map[string]string{"message": "Removed member", "member_id": thMemberID}, opts)
 	},
 }
 
@@ -142,7 +193,16 @@ var thSuiteListCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to get client: %v", err)
 		}
-		testhub.ListSuites(c, thLibraryID)
+		data, err := testhub.ListSuites(c, thLibraryID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMapSlice(data), opts)
+		}
 	},
 }
 
@@ -154,7 +214,16 @@ var thSuiteCreateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to get client: %v", err)
 		}
-		testhub.CreateSuite(c, thLibraryID, thName)
+		data, err := testhub.CreateSuite(c, thLibraryID, thName)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 
@@ -166,7 +235,12 @@ var thSuiteDeleteCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to get client: %v", err)
 		}
-		testhub.DeleteSuite(c, thLibraryID, thSuiteID)
+		err = testhub.DeleteSuite(c, thLibraryID, thSuiteID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		output.FormatAndPrint(map[string]string{"message": "Deleted suite", "suite_id": thSuiteID}, opts)
 	},
 }
 
@@ -186,7 +260,16 @@ var thCaseListCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to get client: %v", err)
 		}
-		testhub.ListCases(c, thLibraryID, thSuiteID)
+		data, err := testhub.ListCases(c, thLibraryID, thSuiteID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMapSlice(data), opts)
+		}
 	},
 }
 
@@ -198,7 +281,16 @@ var thCaseGetCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to get client: %v", err)
 		}
-		testhub.GetCase(c, thCaseID)
+		data, err := testhub.GetCase(c, thCaseID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 
@@ -210,7 +302,16 @@ var thCaseCreateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to get client: %v", err)
 		}
-		testhub.CreateCase(c, thLibraryID, thTitle, thSuiteID, thTypeID, thMaintenanceID, thDesc, thPrecondition)
+		data, err := testhub.CreateCase(c, thLibraryID, thTitle, thSuiteID, thTypeID, thMaintenanceID, thDesc, thPrecondition)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 
@@ -222,7 +323,16 @@ var thCaseUpdateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to get client: %v", err)
 		}
-		testhub.UpdateCase(c, thCaseID, thTitle, thSuiteID, thTypeID, thMaintenanceID, thDesc, thPrecondition)
+		data, err := testhub.UpdateCase(c, thCaseID, thTitle, thSuiteID, thTypeID, thMaintenanceID, thDesc, thPrecondition)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 
@@ -234,7 +344,12 @@ var thCaseDeleteCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to get client: %v", err)
 		}
-		testhub.DeleteCase(c, thCaseID)
+		err = testhub.DeleteCase(c, thCaseID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		output.FormatAndPrint(map[string]string{"message": "Deleted case", "case_id": thCaseID}, opts)
 	},
 }
 
@@ -254,7 +369,16 @@ var thPlanListCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to get client: %v", err)
 		}
-		testhub.ListPlans(c, thLibraryID)
+		data, err := testhub.ListPlans(c, thLibraryID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMapSlice(data), opts)
+		}
 	},
 }
 
@@ -266,7 +390,16 @@ var thPlanCreateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to get client: %v", err)
 		}
-		testhub.CreatePlan(c, thLibraryID, thName, thTypeID, thAssigneeID, thStartAt, thEndAt)
+		data, err := testhub.CreatePlan(c, thLibraryID, thName, thTypeID, thAssigneeID, thStartAt, thEndAt)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 
@@ -286,7 +419,16 @@ var thRunCreateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to get client: %v", err)
 		}
-		testhub.CreateRun(c, thLibraryID, thPlanID, thCaseID, thExecutorID)
+		data, err := testhub.CreateRun(c, thLibraryID, thPlanID, thCaseID, thExecutorID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 

@@ -3,6 +3,7 @@ package cmd
 import (
 	"log"
 	"pingcode-client/internal/app/directory"
+	"pingcode-client/internal/pkg/output"
 
 	"github.com/spf13/cobra"
 )
@@ -45,7 +46,16 @@ var dirUserListCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		directory.ListUsers(c, dirKeywords, dirName, dirDeptIDs)
+		data, err := directory.ListUsers(c, dirKeywords, dirName, dirDeptIDs)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMapSlice(data), opts)
+		}
 	},
 }
 
@@ -57,7 +67,16 @@ var dirUserCreateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		directory.CreateUser(c, dirName, dirDisplayName, dirEmail, dirMobile, dirPassword, dirDeptID, dirJobID, dirEmpNum)
+		data, err := directory.CreateUser(c, dirName, dirDisplayName, dirEmail, dirMobile, dirPassword, dirDeptID, dirJobID, dirEmpNum)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 
@@ -69,7 +88,16 @@ var dirUserUpdateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		directory.UpdateUser(c, dirUserID, dirName, dirDisplayName, dirEmail, dirMobile, dirStatus, dirDeptID, dirJobID, dirEmpNum)
+		data, err := directory.UpdateUser(c, dirUserID, dirName, dirDisplayName, dirEmail, dirMobile, dirStatus, dirDeptID, dirJobID, dirEmpNum)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 
@@ -85,7 +113,16 @@ var dirDeptListCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		directory.ListDepartments(c)
+		data, err := directory.ListDepartments(c)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMapSlice(data), opts)
+		}
 	},
 }
 
@@ -97,7 +134,16 @@ var dirDeptCreateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		directory.CreateDepartment(c, dirName, dirParentID, dirHeadID)
+		data, err := directory.CreateDepartment(c, dirName, dirParentID, dirHeadID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 
@@ -109,7 +155,16 @@ var dirDeptUpdateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		directory.UpdateDepartment(c, dirUserID, dirName, dirParentID, dirHeadID)
+		data, err := directory.UpdateDepartment(c, dirUserID, dirName, dirParentID, dirHeadID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		if opts.Raw {
+			output.FormatAndPrint(data, opts)
+		} else {
+			output.FormatAndPrint(toMap(data), opts)
+		}
 	},
 }
 
@@ -121,7 +176,12 @@ var dirDeptDeleteCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		directory.DeleteDepartment(c, dirUserID)
+		err = directory.DeleteDepartment(c, dirUserID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts := GetOutputOptions()
+		output.FormatAndPrint(map[string]string{"message": "Deleted department", "id": dirUserID}, opts)
 	},
 }
 

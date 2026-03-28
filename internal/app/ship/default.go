@@ -1,8 +1,6 @@
 package ship
 
 import (
-	"fmt"
-	"log"
 	"pingcode-client/internal/pkg/sdk"
 
 	"github.com/spf13/cobra"
@@ -13,293 +11,118 @@ func Run(client *sdk.Client) {
 	ListProducts(client)
 }
 
-func ListProducts(client *sdk.Client) {
-	log.Println("Listing products from Ship...")
-	products, err := client.ListProducts()
-	if err != nil {
-		log.Fatalf("Error listing products: %v", err)
-	}
+// ── Product ────────────────────────────────────────────────────────────────
 
-	fmt.Println("Products:")
-	for _, p := range products {
-		fmt.Printf("- %s (ID: %s, Identifier: %s)\n", p.Name, p.ID, p.Identifier)
-	}
+func ListProducts(client *sdk.Client) ([]sdk.Product, error) {
+	return client.ListProducts()
 }
 
-func CreateProduct(client *sdk.Client, product *sdk.Product) {
-	newProduct, err := client.CreateProduct(product)
-	if err != nil {
-		log.Fatalf("Error creating product: %v", err)
-	}
-	fmt.Printf("Created Product: %s (ID: %s, Identifier: %s)\n", newProduct.Name, newProduct.ID, newProduct.Identifier)
+func CreateProduct(client *sdk.Client, product *sdk.Product) (*sdk.Product, error) {
+	return client.CreateProduct(product)
 }
 
-func UpdateProduct(client *sdk.Client, productID string, product *sdk.Product) {
-	updatedProduct, err := client.UpdateProduct(productID, product)
-	if err != nil {
-		log.Fatalf("Error updating product: %v", err)
-	}
-	fmt.Printf("Updated Product: %s (ID: %s)\n", updatedProduct.Name, updatedProduct.ID)
+func UpdateProduct(client *sdk.Client, productID string, product *sdk.Product) (*sdk.Product, error) {
+	return client.UpdateProduct(productID, product)
 }
 
-func ListProductMembers(client *sdk.Client, productID string) {
-	members, err := client.ListProductMembers(productID)
-	if err != nil {
-		log.Fatalf("Error listing product members: %v", err)
-	}
-	fmt.Println("Product Members:")
-	for _, m := range members {
-		name := ""
-		if m.User != nil {
-			name = m.User.DisplayName
-		} else if m.UserGroup != nil {
-			name = m.UserGroup.Name
-		}
-		roleName := ""
-		if m.Role != nil {
-			roleName = m.Role.Name
-		}
-		fmt.Printf("- %s (ID: %s, Type: %s, Role: %s)\n", name, m.ID, m.Type, roleName)
-	}
+func ListProductMembers(client *sdk.Client, productID string) ([]sdk.ProductMember, error) {
+	return client.ListProductMembers(productID)
 }
 
-func AddProductMember(client *sdk.Client, productID string, memberID string, memberType string, roleID string) {
-	member, err := client.AddProductMember(productID, memberID, memberType, roleID)
-	if err != nil {
-		log.Fatalf("Error adding product member: %v", err)
-	}
-	fmt.Printf("Added Member: %s (ID: %s) to Product: %s\n", member.ID, member.Type, productID)
+func AddProductMember(client *sdk.Client, productID string, memberID string, memberType string, roleID string) (*sdk.ProductMember, error) {
+	return client.AddProductMember(productID, memberID, memberType, roleID)
 }
 
-func RemoveProductMember(client *sdk.Client, productID string, memberID string) {
-	err := client.RemoveProductMember(productID, memberID)
-	if err != nil {
-		log.Fatalf("Error removing product member: %v", err)
-	}
-	fmt.Printf("Removed Member: %s from Product: %s\n", memberID, productID)
+func RemoveProductMember(client *sdk.Client, productID string, memberID string) error {
+	return client.RemoveProductMember(productID, memberID)
 }
 
-func AddProductSuite(client *sdk.Client, productID string, suite *sdk.IdeaSuite) {
-	newSuite, err := client.AddProductSuite(productID, suite)
-	if err != nil {
-		log.Fatalf("Error adding product suite: %v", err)
-	}
-	fmt.Printf("Added Suite: %s (ID: %s) to Product: %s\n", newSuite.Name, newSuite.ID, productID)
+func AddProductSuite(client *sdk.Client, productID string, suite *sdk.IdeaSuite) (*sdk.IdeaSuite, error) {
+	return client.AddProductSuite(productID, suite)
 }
 
-func ListProductSuites(client *sdk.Client, productID string) {
-	suites, err := client.ListProductSuites(productID)
-	if err != nil {
-		log.Fatalf("Error listing product suites: %v", err)
-	}
-	fmt.Println("Product Modules (Suites):")
-	for _, s := range suites {
-		fmt.Printf("- %s (ID: %s, Type: %s)\n", s.Name, s.ID, s.Type)
-	}
+func ListProductSuites(client *sdk.Client, productID string) ([]sdk.IdeaSuite, error) {
+	return client.ListProductSuites(productID)
 }
 
-func RemoveProductSuite(client *sdk.Client, productID string, suiteID string) {
-	err := client.RemoveProductSuite(productID, suiteID)
-	if err != nil {
-		log.Fatalf("Error removing product suite: %v", err)
-	}
-	fmt.Printf("Removed Suite: %s from Product: %s\n", suiteID, productID)
+func RemoveProductSuite(client *sdk.Client, productID string, suiteID string) error {
+	return client.RemoveProductSuite(productID, suiteID)
 }
 
-func ListProductPlans(client *sdk.Client, productID string) {
-	plans, err := client.ListProductPlans(productID)
-	if err != nil {
-		log.Fatalf("Error listing product plans: %v", err)
-	}
-	fmt.Println("Product Plans:")
-	for _, p := range plans {
-		fmt.Printf("- %s (ID: %s)\n", p.Name, p.ID)
-	}
+func ListProductPlans(client *sdk.Client, productID string) ([]sdk.IdeaPlan, error) {
+	return client.ListProductPlans(productID)
 }
 
-func ListProductChannels(client *sdk.Client, productID string) {
-	channels, err := client.ListProductChannels(productID)
-	if err != nil {
-		log.Fatalf("Error listing product channels: %v", err)
-	}
-	fmt.Println("Product Channels:")
-	for _, c := range channels {
-		fmt.Printf("- %s (ID: %s)\n", c.Name, c.ID)
-	}
+func ListProductChannels(client *sdk.Client, productID string) ([]sdk.ProductChannel, error) {
+	return client.ListProductChannels(productID)
 }
 
-func ListProductTicketTypes(client *sdk.Client, productID string) {
-	types, err := client.ListProductTicketTypes(productID)
-	if err != nil {
-		log.Fatalf("Error listing product ticket types: %v", err)
-	}
-	fmt.Println("Product Ticket Types:")
-	for _, t := range types {
-		fmt.Printf("- %s (ID: %s)\n", t.TicketType.Name, t.ID)
-	}
+func ListProductTicketTypes(client *sdk.Client, productID string) ([]sdk.ProductTicketType, error) {
+	return client.ListProductTicketTypes(productID)
 }
 
-func ListProductTags(client *sdk.Client, productID string) {
-	tags, err := client.ListProductTags(productID)
-	if err != nil {
-		log.Fatalf("Error listing product tags: %v", err)
-	}
-	fmt.Println("Product Tags:")
-	for _, t := range tags {
-		fmt.Printf("- %s (ID: %s, Color: %s)\n", t.Name, t.ID, t.Color)
-	}
+func ListProductTags(client *sdk.Client, productID string) ([]sdk.ProductTag, error) {
+	return client.ListProductTags(productID)
 }
 
-func AddProductTag(client *sdk.Client, productID string, name string) {
-	tag, err := client.AddProductTag(productID, name)
-	if err != nil {
-		log.Fatalf("Error adding product tag: %v", err)
-	}
-	fmt.Printf("Added Tag: %s (ID: %s) to Product: %s\n", tag.Name, tag.ID, productID)
+func AddProductTag(client *sdk.Client, productID string, name string) (*sdk.ProductTag, error) {
+	return client.AddProductTag(productID, name)
 }
 
-func RemoveProductTag(client *sdk.Client, productID string, tagID string) {
-	err := client.RemoveProductTag(productID, tagID)
-	if err != nil {
-		log.Fatalf("Error removing product tag: %v", err)
-	}
-	fmt.Printf("Removed Tag: %s from Product: %s\n", tagID, productID)
+func RemoveProductTag(client *sdk.Client, productID string, tagID string) error {
+	return client.RemoveProductTag(productID, tagID)
 }
 
-func ListIdeas(client *sdk.Client, productID string) {
-	ideas, err := client.ListIdeas(productID)
-	if err != nil {
-		log.Fatalf("Error listing ideas: %v", err)
-	}
+// ── Idea ──────────────────────────────────────────────────────────────────
 
-	fmt.Println("Ideas:")
-	for _, i := range ideas {
-		stateName := ""
-		if i.State != nil {
-			stateName = i.State.Name
-		}
-		fmt.Printf("- [%s] %s (ID: %s, State: %s)\n", i.Identifier, i.Title, i.ID, stateName)
-	}
+func ListIdeas(client *sdk.Client, productID string) ([]sdk.Idea, error) {
+	return client.ListIdeas(productID)
 }
 
-func CreateIdea(client *sdk.Client, idea *sdk.Idea) {
-	newIdea, err := client.CreateIdea(idea)
-	if err != nil {
-		log.Fatalf("Error creating idea: %v", err)
-	}
-	fmt.Printf("Created Idea: %s (ID: %s, Identifier: %s)\n", newIdea.Title, newIdea.ID, newIdea.Identifier)
+func CreateIdea(client *sdk.Client, idea *sdk.Idea) (*sdk.Idea, error) {
+	return client.CreateIdea(idea)
 }
 
-func UpdateIdea(client *sdk.Client, ideaID string, idea *sdk.Idea) {
-	updatedIdea, err := client.UpdateIdea(ideaID, idea)
-	if err != nil {
-		log.Fatalf("Error updating idea: %v", err)
-	}
-	fmt.Printf("Updated Idea: %s (ID: %s)\n", updatedIdea.Title, updatedIdea.ID)
+func UpdateIdea(client *sdk.Client, ideaID string, idea *sdk.Idea) (*sdk.Idea, error) {
+	return client.UpdateIdea(ideaID, idea)
 }
 
-func ListIdeaStates(client *sdk.Client, productID string) {
-	states, err := client.ListIdeaStates(productID)
-	if err != nil {
-		log.Fatalf("Error listing idea states: %v", err)
-	}
-	fmt.Println("Idea States:")
-	for _, s := range states {
-		fmt.Printf("- %s (ID: %s, Type: %s)\n", s.Name, s.ID, s.Type)
-	}
+func ListIdeaStates(client *sdk.Client, productID string) ([]sdk.IdeaState, error) {
+	return client.ListIdeaStates(productID)
 }
 
-func ListIdeaPriorities(client *sdk.Client, productID string) {
-	priorities, err := client.ListIdeaPriorities(productID)
-	if err != nil {
-		log.Fatalf("Error listing idea priorities: %v", err)
-	}
-	fmt.Println("Idea Priorities:")
-	for _, p := range priorities {
-		fmt.Printf("- %s (ID: %s)\n", p.Name, p.ID)
-	}
+func ListIdeaPriorities(client *sdk.Client, productID string) ([]sdk.IdeaPriority, error) {
+	return client.ListIdeaPriorities(productID)
 }
 
-func ListIdeaProperties(client *sdk.Client, productID string) {
-	properties, err := client.ListIdeaProperties(productID)
-	if err != nil {
-		log.Fatalf("Error listing idea properties: %v", err)
-	}
-	fmt.Println("Idea Properties:")
-	for _, p := range properties {
-		fmt.Printf("- %s (ID: %s, Type: %s)\n", p.Name, p.ID, p.Type)
-	}
+func ListIdeaProperties(client *sdk.Client, productID string) ([]sdk.IdeaProperty, error) {
+	return client.ListIdeaProperties(productID)
 }
 
-func ListIdeaSuites(client *sdk.Client, productID string) {
-	suites, err := client.ListIdeaSuites(productID)
-	if err != nil {
-		log.Fatalf("Error listing idea suites: %v", err)
-	}
-	fmt.Println("Idea Modules (Suites):")
-	for _, s := range suites {
-		fmt.Printf("- %s (ID: %s, Type: %s)\n", s.Name, s.ID, s.Type)
-	}
+func ListIdeaSuites(client *sdk.Client, productID string) ([]sdk.IdeaSuite, error) {
+	return client.ListIdeaSuites(productID)
 }
 
-func ListIdeaPlans(client *sdk.Client, productID string) {
-	plans, err := client.ListIdeaPlans(productID)
-	if err != nil {
-		log.Fatalf("Error listing idea plans: %v", err)
-	}
-	fmt.Println("Idea Plans:")
-	for _, p := range plans {
-		fmt.Printf("- %s (ID: %s)\n", p.Name, p.ID)
-	}
+func ListIdeaPlans(client *sdk.Client, productID string) ([]sdk.IdeaPlan, error) {
+	return client.ListIdeaPlans(productID)
 }
 
-func ListIdeaTransitionHistories(client *sdk.Client, ideaID string) {
-	histories, err := client.ListIdeaTransitionHistories(ideaID)
-	if err != nil {
-		log.Fatalf("Error listing idea transition histories: %v", err)
-	}
-	fmt.Println("Idea Transition Histories:")
-	for _, h := range histories {
-		fromName := "None"
-		if h.FromState != nil {
-			fromName = h.FromState.Name
-		}
-		toName := "None"
-		if h.ToState != nil {
-			toName = h.ToState.Name
-		}
-		fmt.Printf("- From: %s -> To: %s (ID: %s)\n", fromName, toName, h.ID)
-	}
-}
-
-func Help(cmd *cobra.Command, args []string) {
-	// ctx := cmd.Context()
-	cmd.Help()
+func ListIdeaTransitionHistories(client *sdk.Client, ideaID string) ([]sdk.IdeaTransitionHistory, error) {
+	return client.ListIdeaTransitionHistories(ideaID)
 }
 
 // ── Ticket ────────────────────────────────────────────────────────────────
 
-func ListTickets(client *sdk.Client, productID, typeID, stateID, priorityID, keywords string) {
-	tickets, err := client.ListTickets(productID, typeID, stateID, priorityID, keywords)
-	if err != nil {
-		log.Fatalf("Error listing tickets: %v", err)
-	}
-	fmt.Println("Tickets:")
-	for _, t := range tickets {
-		fmt.Printf("- [%s] %s (ID: %s)\n", t.Identifier, t.Title, t.ID)
-	}
+func ListTickets(client *sdk.Client, productID, typeID, stateID, priorityID, keywords string) ([]sdk.Ticket, error) {
+	return client.ListTickets(productID, typeID, stateID, priorityID, keywords)
 }
 
-func GetTicket(client *sdk.Client, ticketID string) {
-	t, err := client.GetTicket(ticketID)
-	if err != nil {
-		log.Fatalf("Error getting ticket: %v", err)
-	}
-	fmt.Printf("Ticket: %s\nID: %s\nIdentifier: %s\nTitle: %s\n", t.ID, t.ID, t.Identifier, t.Title)
+func GetTicket(client *sdk.Client, ticketID string) (*sdk.Ticket, error) {
+	return client.GetTicket(ticketID)
 }
 
-func CreateTicket(client *sdk.Client, productID, title, desc, typeID, assigneeID, priorityID, channelID, customerID string) {
-	t, err := client.CreateTicket(&sdk.Ticket{
+func CreateTicket(client *sdk.Client, productID, title, desc, typeID, assigneeID, priorityID, channelID, customerID string) (*sdk.Ticket, error) {
+	return client.CreateTicket(&sdk.Ticket{
 		ProductID:   productID,
 		Title:       title,
 		Description: desc,
@@ -309,14 +132,10 @@ func CreateTicket(client *sdk.Client, productID, title, desc, typeID, assigneeID
 		ChannelID:   channelID,
 		CustomerID:  customerID,
 	})
-	if err != nil {
-		log.Fatalf("Error creating ticket: %v", err)
-	}
-	fmt.Printf("Created Ticket: %s (ID: %s)\n", t.Identifier, t.ID)
 }
 
-func UpdateTicket(client *sdk.Client, ticketID, title, desc, typeID, stateID, assigneeID, priorityID, solutionID, customerID string) {
-	t, err := client.UpdateTicket(ticketID, &sdk.Ticket{
+func UpdateTicket(client *sdk.Client, ticketID, title, desc, typeID, stateID, assigneeID, priorityID, solutionID, customerID string) (*sdk.Ticket, error) {
+	return client.UpdateTicket(ticketID, &sdk.Ticket{
 		Title:       title,
 		Description: desc,
 		TypeID:      typeID,
@@ -326,30 +145,16 @@ func UpdateTicket(client *sdk.Client, ticketID, title, desc, typeID, stateID, as
 		SolutionID:  solutionID,
 		CustomerID:  customerID,
 	})
-	if err != nil {
-		log.Fatalf("Error updating ticket: %v", err)
-	}
-	fmt.Printf("Updated Ticket: %s (ID: %s)\n", t.Identifier, t.ID)
 }
 
-func ListTicketPriorities(client *sdk.Client, productID string) {
-	priorities, err := client.ListTicketPriorities(productID)
-	if err != nil {
-		log.Fatalf("Error listing ticket priorities: %v", err)
-	}
-	fmt.Println("Ticket Priorities:")
-	for _, p := range priorities {
-		fmt.Printf("- %s (ID: %s)\n", p.Name, p.ID)
-	}
+func ListTicketPriorities(client *sdk.Client, productID string) ([]sdk.TicketPriority, error) {
+	return client.ListTicketPriorities(productID)
 }
 
-func ListTicketStates(client *sdk.Client, productID string) {
-	states, err := client.ListTicketStates(productID)
-	if err != nil {
-		log.Fatalf("Error listing ticket states: %v", err)
-	}
-	fmt.Println("Ticket States:")
-	for _, s := range states {
-		fmt.Printf("- %s [%s] (ID: %s)\n", s.Name, s.Type, s.ID)
-	}
+func ListTicketStates(client *sdk.Client, productID string) ([]sdk.TicketState, error) {
+	return client.ListTicketStates(productID)
+}
+
+func Help(cmd *cobra.Command, args []string) {
+	cmd.Help()
 }
