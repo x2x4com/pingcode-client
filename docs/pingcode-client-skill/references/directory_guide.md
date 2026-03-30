@@ -6,6 +6,23 @@
 
 编译完成的二进制文件为 `pingcode-client`
 
+## 全局输出格式
+
+所有命令支持 `--output` 和 `--raw` 全局 flags：
+
+```bash
+# 默认 table 格式
+pingcode-client directory user list
+
+# JSON 格式
+pingcode-client directory user list --output json
+
+# 原始 API 响应
+pingcode-client directory user list --raw --output json
+```
+
+---
+
 ## 1. ID 获取速查表 (Quick Reference)
 
 | 资源类型 | 获取命令 | 备注 |
@@ -47,16 +64,24 @@ pingcode-client directory user create \
 ### 2.3 更新成员信息
 ```bash
 # 更新显示名
-pingcode-client directory user update --id {user_id} --display-name "张三(SRE)"
+pingcode-client directory user update \
+  --id {user_id} \
+  --display-name "张三(SRE)"
 
 # 禁用账号
-pingcode-client directory user update --id {user_id} --status disabled
+pingcode-client directory user update \
+  --id {user_id} \
+  --status disabled
 
 # 启用账号
-pingcode-client directory user update --id {user_id} --status enabled
+pingcode-client directory user update \
+  --id {user_id} \
+  --status enabled
 
 # 更新部门
-pingcode-client directory user update --id {user_id} --department-id {new_dept_id}
+pingcode-client directory user update \
+  --id {user_id} \
+  --department-id {new_dept_id}
 ```
 
 ---
@@ -75,22 +100,33 @@ pingcode-client directory user update --id {user_id} --department-id {new_dept_i
 pingcode-client directory department create --name "技术中心"
 
 # 创建子部门
-pingcode-client directory department create --name "后端研发组" --parent-id {parent_dept_id}
+pingcode-client directory department create \
+  --name "后端研发组" \
+  --parent-id {parent_dept_id}
 
 # 指定部门负责人
-pingcode-client directory department create --name "QA组" --parent-id {pid} --head-id {user_id}
+pingcode-client directory department create \
+  --name "QA组" \
+  --parent-id {pid} \
+  --head-id {user_id}
 ```
 
 ### 3.3 更新部门
 ```bash
 # 重命名部门
-pingcode-client directory department update --id {dept_id} --name "研发中心"
+pingcode-client directory department update \
+  --id {dept_id} \
+  --name "研发中心"
 
 # 更换负责人
-pingcode-client directory department update --id {dept_id} --head-id {new_user_id}
+pingcode-client directory department update \
+  --id {dept_id} \
+  --head-id {new_user_id}
 
 # 迁移到其他父部门
-pingcode-client directory department update --id {dept_id} --parent-id {new_parent_id}
+pingcode-client directory department update \
+  --id {dept_id} \
+  --parent-id {new_parent_id}
 ```
 
 ### 3.4 删除部门
@@ -122,8 +158,18 @@ pingcode-client directory user create \
 pingcode-client directory department list
 
 # 2. 新建子部门
-pingcode-client directory department create --name "平台组" --parent-id {tech_dept_id}
+pingcode-client directory department create \
+  --name "平台组" \
+  --parent-id {tech_dept_id}
 
 # 3. 将成员迁移到新部门
-pingcode-client directory user update --id {user_id} --department-id {new_dept_id}
+pingcode-client directory user update \
+  --id {user_id} \
+  --department-id {new_dept_id}
 ```
+
+---
+
+## 5. 常见问题 (Troubleshooting)
+
+- **全局 flags**: 所有命令支持 `--output`（json/yaml/markdown/table）和 `--raw`（原始 API 响应）全局 flags。

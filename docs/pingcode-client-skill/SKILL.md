@@ -1,19 +1,45 @@
 ---
 name: pingcode-client-skill
-description: "Use when: 需要操作 PingCode 项目管理平台，包括：创建/查询/更新/删除工作项、需求、用户故事、任务、缺陷(Bug)；管理项目迭代(Sprint)、版本(Release)、看板(Kanban)；管理 Wiki 知识库页面；管理测试用例、测试计划、测试执行(TestHub)；查询企业成员和部门信息。适用角色：产品经理(PM)规划需求、研发经理拆分任务分配迭代、开发工程师认领和更新任务状态、测试工程师管理测试用例和计划、DevOps 管理版本发布。触发关键词：PingCode、工作项、需求、迭代、Sprint、版本、看板、Wiki、测试计划、测试用例、项目管理。"
+description: "Use when: 需要操作 PingCode 项目管理平台，包括：创建/查询/更新/删除工作项(WorkItem)、需求(Idea)、产品(Product)、工单(Ticket)；管理项目迭代(Sprint)、版本(Release)、看板(Kanban)、成员(Member)；管理 Wiki 知识库的空间(Space)和页面(Page)；管理测试用例(Case)、测试计划(Plan)、测试执行(Run)；查询企业成员(Directory)和部门(Department)。适用场景：研发团队的任务管理、PM 的需求规划、DevOps 的版本发布、QA 的测试用例管理。触发关键词：PingCode、工作项、WorkItem、需求、Idea、迭代、Sprint、版本、Release、看板、Kanban、Wiki、Space、Page、测试计划、TestHub、测试用例、企业通讯录。"
 metadata:
   {
     "openclaw":
       {
-        "requires": { "bins": ["pingcode-client"], "env": ["PINGCODE_CLIENT_ID", PINGCODE_CLIENT_SECRET] }
+        "requires": { "bins": ["pingcode-client"], "env": ["PINGCODE_CLIENT_ID", "PINGCODE_CLIENT_SECRET"] }
       },
   }
 ---
 
-# PingCode 工作流管理指南 (CLI)
+# PingCode CLI 工具指南
+
+## 全局输出格式
+
+所有命令支持以下全局 flags：
+
+| Flag | 默认值 | 说明 |
+| :--- | :--- | :--- |
+| `--output` | `table` | 输出格式：`json`、`yaml`、`markdown`、`table` |
+| `--raw` | `false` | 输出原始 API 数据，不做任何格式化转换 |
+
+**示例：**
+```bash
+# 默认 table 格式
+pingcode-client ship product list
+
+# JSON 格式（便于程序处理）
+pingcode-client ship product list --output json
+
+# YAML 格式
+pingcode-client ship product list --output yaml
+
+# 原始 API 响应（包含所有字段）
+pingcode-client ship product list --raw --output json
+```
 
 ## 边界
-当前这个版本的 PingCode 工作流管理指南，覆盖以下模块：
+
+当前版本覆盖以下模块：
+
 - **产品管理 (Ship)**: 产品、需求、工单
 - **项目管理 (Project)**: 项目、工作项、迭代、版本、看板、成员
 - **知识管理 (Wiki)**: 空间、页面、内容
@@ -35,7 +61,7 @@ https://github.com/x2x4com/pingcode-client/releases
 bash scripts/install.sh
 
 # 或指定版本
-bash scripts/install.sh v0.1.4
+bash scripts/install.sh v0.2.0
 ```
 
 脚本支持以下平台：
@@ -83,17 +109,25 @@ export PINGCODE_CLIENT_SECRET=<your_client_secret>
 | DevOps | 负责产品的部署、监控、维护等 | devops | DevOps |
 | 安全专家 | 负责产品的安全设计、测试、维护等, 也是代码审核的一员 | security | 安全专家 |
 
-通过 tag 标签，来标识不同的角色，下吗的命令可以列出和创建 tag 标签
+通过 tag 标签，来标识不同的角色，下面的命令可以列出和创建 tag 标签：
 ```
 $ pingcode-client project metadata tags list # 列出所有的 tag 标签
 $ pingcode-client project metadata tags create --name "security" # 创建一个新的 tag 标签
 ```
 
-注意标签名唯一，如果创建重复名称标签会报错
+注意标签名唯一，如果创建重复名称标签会报错：
 ```
 Error creating tag: create tag failed with status: 400, body: {"code":"100352","message":"'tag'资源已经存在"}
 ```
 
+## 输出格式使用场景
+
+| 格式 | 适用场景 |
+| ---- | -------- |
+| `table`（默认） | 人工阅读，快速浏览 |
+| `json` | 程序处理、脚本集成、--raw 组合获取完整字段 |
+| `yaml` | 配置文件、CI/CD 集成 |
+| `markdown` | 文档生成、报告输出 |
 
 ## 工作流程
 
@@ -105,7 +139,7 @@ Error creating tag: create tag failed with status: 400, body: {"code":"100352","
 | 1 | 确定产品范围，获取产品列表，与用户确认操作目标，记录产品ID | 参考`references/ship_guide.md`的产品列表 |
 | 2 | 与用户沟通明确需求目标以及交付内容，时间点，然后创建需求 | 参考`references/ship_guide.md`创建需求 |
 
-Example
+Example：
 ```bash
 # 步骤 1: 获取产品列表，与用户确认目标产品，记录 product_id
 pingcode-client ship product list
@@ -129,7 +163,7 @@ pingcode-client ship ideas create \
 | 3 | 在对应项目中预创建 Epic/Story 占位，记录需求背景和验收标准 | 参考 `references/workitem_guide.md` 创建工作项 |
 | 4 | 轮询或查询研发经理反馈（工作项描述/评论记录） | 参考 `references/workitem_guide.md` 查看工作项详情 |
 
-Example
+Example：
 ```bash
 # 步骤 1: 查询待评审需求
 pingcode-client ship ideas list --product-id {product_id} --state-id {reviewing_state_id}
@@ -158,7 +192,7 @@ pingcode-client project workitem get -i {epic_id}
 | 3 | 需求变更时：更新 Epic/Story 描述，调整优先级，并通知相关方 | 参考 `references/workitem_guide.md` 更新工作项 |
 | 4 | 优先级变更：调整需求/工作项优先级，确保迭代排期合理 | 参考 `references/workitem_guide.md` 更新工作项 |
 
-Example
+Example：
 ```bash
 # 步骤 1: 查看研发反馈（研发经理会更新工作项描述）
 pingcode-client project workitem get -i {epic_id}
@@ -190,7 +224,7 @@ pingcode-client project workitem update \
 | 3 | 将评审结果写入 Epic 工作项描述，给出明确结论（可行/不可行/需调整范围） | 参考 `references/workitem_guide.md` 更新工作项 |
 | 4 | 若涉及技术风险：创建 Bug/Issue 类型工作项记录风险，关联到 Epic | 参考 `references/workitem_guide.md` 工作项关联 |
 
-Example
+Example：
 ```bash
 # 步骤 1: 查询 Epic 工作项（由 PM 提前创建）
 pingcode-client project workitem list \
@@ -225,7 +259,7 @@ pingcode-client project workitem relation add \
 | 3 | 将 Story 拆解为具体子任务（task），分配给成员，打角色标签 | 参考 `references/workitem_guide.md` 创建/关联工作项 |
 | 4 | 迭代负载评估：查询本迭代所有工作项，确认工作量合理 | 参考 `references/workitem_guide.md` 组合过滤查询 |
 
-Example
+Example：
 ```bash
 # 步骤 1: 查看当前迭代（Scrum 项目）
 pingcode-client project iteration list --project-id {project_id}
@@ -260,7 +294,7 @@ pingcode-client project workitem list \
 | 4 | 创建 Story 工作项，对应该需求，分配给合适的负责人，关联当前迭代 | 参考 `references/workitem_guide.md` 创建工作项 |
 | 5 | 将 Story 拆解为具体子任务（task），按后端/前端/测试分配，打上对应角色标签 | 参考 `references/workitem_guide.md` 标签管理 |
 
-Example
+Example：
 ```bash
 # 步骤 1: 查看待实现的需求
 pingcode-client ship ideas list --product-id {product_id}
@@ -314,7 +348,7 @@ pingcode-client project workitem tag add -i {frontend_task_id} -t {frontend_tag_
 | 3 | 审核通过：将工作项状态流转到"待测试" | 参考 `references/workitem_guide.md` 更新工作项状态 |
 | 4 | 审核不通过：退回工作项并在描述中写明审核意见 | 参考 `references/workitem_guide.md` 更新工作项状态 |
 
-Example
+Example：
 ```bash
 # 步骤 1: 获取"代码审核"和"待测试"等状态 ID
 pingcode-client project metadata statuses
@@ -341,6 +375,7 @@ pingcode-client project workitem update \
   --desc "审核意见：需要补充单元测试以覆盖边界场景，并修复 XSS 风险"
 ```
 
+### 后端开发
 
 #### 开发流程
 | 步骤 | 描述 | 操作手册ID |
@@ -349,7 +384,7 @@ pingcode-client project workitem update \
 | 2 | 领取工作项：将状态更新为"进行中" | 参考 `references/workitem_guide.md` 更新工作项状态 |
 | 3 | 开发完成后，将工作项状态更新为"代码审核"，等待研发经理审核 | 参考 `references/workitem_guide.md` 更新工作项状态 |
 
-Example
+Example：
 ```bash
 # 步骤 1: 获取 backend 标签 ID 和"打开"状态 ID
 pingcode-client project metadata tags list
@@ -372,6 +407,8 @@ pingcode-client project workitem update \
   --state-id {code_review_state_id}
 ```
 
+### 前端开发
+
 #### 开发流程
 | 步骤 | 描述 | 操作手册ID |
 | ---- | ---- | ---------- |
@@ -379,7 +416,7 @@ pingcode-client project workitem update \
 | 2 | 领取工作项：将状态更新为"进行中" | 参考 `references/workitem_guide.md` 更新工作项状态 |
 | 3 | 开发完成后，将工作项状态更新为"代码审核"，等待研发经理审核 | 参考 `references/workitem_guide.md` 更新工作项状态 |
 
-Example
+Example：
 ```bash
 # 步骤 1: 获取 frontend 标签 ID 和"打开"状态 ID
 pingcode-client project metadata tags list
@@ -413,7 +450,7 @@ pingcode-client project workitem update \
 | 4 | 测试不通过：退回工作项，在描述中记录缺陷复现步骤，打 `qa` 标签标记 | 参考 `references/workitem_guide.md` 更新工作项状态 |
 | 5 | （可选）在 TestHub 创建/执行测试用例，关联到测试计划 | 参考 `references/testhub_guide.md` |
 
-Example
+Example：
 ```bash
 # 步骤 1: 获取"待测试"、"测试中"、"已完成"、"重新打开"等状态 ID
 pingcode-client project metadata statuses
@@ -460,7 +497,7 @@ pingcode-client testhub run create --library-id {lid} --plan-id {pid} --case-id 
 | 4 | 部署完成后，将版本标记为"已发布"，并更新工作项状态 | 参考 `references/project_guide.md` 版本管理 |
 | 5 | 创建下一个迭代，规划下一开发周期 | 参考 `references/project_guide.md` 迭代管理 |
 
-Example
+Example：
 ```bash
 # 步骤 1: 查看当前迭代和版本
 pingcode-client project iteration list --project-id {project_id}
@@ -484,7 +521,7 @@ pingcode-client project workitem list \
   --project-id {project_id} \
   --state-ids {done_state_id}
 
-# 步骤 5: 部署完成 → 更新版本 release-date 确认发布时间（CLI 暂无 --released 标记，以 release-date 为准）
+# 步骤 5: 部署完成 → 更新版本 release-date 确认发布时间
 pingcode-client project version update -i {version_id} --release-date "2026-04-30"
 
 # 步骤 6: 创建下一个迭代
@@ -502,7 +539,7 @@ pingcode-client project iteration create \
 | 2 | 创建部署工作项（type: task），关联到发布版本和当前迭代 | 参考 `references/workitem_guide.md` 创建工作项 |
 | 3 | 按部署进展更新工作项状态（进行中 → 已完成） | 参考 `references/workitem_guide.md` 更新工作项状态 |
 
-Example
+Example：
 ```bash
 # 步骤 1: 查询 devops 标签的工作项
 pingcode-client project metadata tags list
@@ -536,7 +573,7 @@ pingcode-client project workitem update -i {deploy_task_id} --state-id {done_sta
 | 3 | 审核通过：将工作项状态流转到"待测试" | 参考 `references/workitem_guide.md` 更新工作项状态 |
 | 4 | 发现安全问题：退回工作项，创建独立的安全缺陷工作项并打 `security` 标签 | 参考 `references/workitem_guide.md` 创建工作项 |
 
-Example
+Example：
 ```bash
 # 步骤 1: 获取 security 标签 ID 和相关状态 ID
 pingcode-client project metadata tags list
