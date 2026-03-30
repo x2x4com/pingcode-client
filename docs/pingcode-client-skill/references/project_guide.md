@@ -4,6 +4,21 @@
 
 编译完成的二进制文件为 `pingcode-client`
 
+## 全局输出格式
+
+所有命令支持 `--output` 和 `--raw` 全局 flags：
+
+```bash
+# 默认 table 格式
+pingcode-client project iteration list --project-id {pid}
+
+# JSON 格式
+pingcode-client project iteration list --project-id {pid} --output json
+
+# 原始 API 响应
+pingcode-client project iteration list --project-id {pid} --raw --output json
+```
+
 ---
 
 ## 1. ID 获取速查表 (Quick Reference)
@@ -11,10 +26,10 @@
 | 资源类型 | 获取命令 | 备注 |
 | :--- | :--- | :--- |
 | **项目列表** | `pingcode-client project list` | 所有操作的基础 |
-| **迭代列表** | `pingcode-client project iteration list -p {pid}` | 获取项目下所有 Sprint |
-| **版本列表** | `pingcode-client project version list -p {pid}` | 获取项目下所有 Release |
-| **看板列表** | `pingcode-client project kanban list -p {pid}` | 获取项目下所有看板 |
-| **看板栏列表** | `pingcode-client project kanban entries -p {pid} -b {bid}` | 获取看板列 (Entry/Column) |
+| **迭代列表** | `pingcode-client project iteration list --project-id {pid}` | 获取项目下所有 Sprint |
+| **版本列表** | `pingcode-client project version list --project-id {pid}` | 获取项目下所有 Release |
+| **看板列表** | `pingcode-client project kanban list --project-id {pid}` | 获取项目下所有看板 |
+| **看板栏列表** | `pingcode-client project kanban entries --project-id {pid} --board-id {bid}` | 获取看板列 (Entry/Column) |
 
 ---
 
@@ -25,14 +40,14 @@
 ### 2.1 查看迭代
 
 ```bash
-pingcode-client project iteration list -p {project_id}
+pingcode-client project iteration list --project-id {project_id}
 ```
 
 ### 2.2 创建迭代
 
 ```bash
 pingcode-client project iteration create \
-  -p {project_id} \
+  --project-id {project_id} \
   --name "Sprint 10" \
   --start-date "2026-04-01" \
   --end-date "2026-04-14"
@@ -72,14 +87,14 @@ pingcode-client project workitem update \
 ### 3.1 查看版本
 
 ```bash
-pingcode-client project version list -p {project_id}
+pingcode-client project version list --project-id {project_id}
 ```
 
 ### 3.2 创建版本
 
 ```bash
 pingcode-client project version create \
-  -p {project_id} \
+  --project-id {project_id} \
   --name "v1.2.0" \
   --desc "本版本包含 OAuth 登录、性能优化等功能" \
   --release-date "2026-04-30"
@@ -87,7 +102,7 @@ pingcode-client project version create \
 
 ### 3.3 更新版本（确认发布时间）
 
-通过设置 `--release-date` 来记录实际发布日期（CLI 暂不支持 `--released` 标记位，以 release-date 为准）：
+通过设置 `--release-date` 来记录实际发布日期：
 
 ```bash
 pingcode-client project version update \
@@ -104,7 +119,7 @@ pingcode-client project version delete -i {version_id}
 
 ### 3.5 将工作项关联到版本
 
-> ⚠️ **注意**：当前 CLI 的 `workitem update` 未暴露 `--version-id` 参数（SDK 层面支持 `version_ids` 字段），请在 PingCode Web 界面操作，或等待后续 CLI 版本支持。
+> ⚠️ **注意**：当前 CLI 的 `workitem update` 未暴露 `--version-id` 参数，请在 PingCode Web 界面操作，或等待后续 CLI 版本支持。
 
 ---
 
@@ -115,20 +130,22 @@ pingcode-client project version delete -i {version_id}
 ### 4.1 查看看板
 
 ```bash
-pingcode-client project kanban list -p {project_id}
+pingcode-client project kanban list --project-id {project_id}
 ```
 
 ### 4.2 查看看板栏（列）
 
 ```bash
-pingcode-client project kanban entries -p {project_id} -b {board_id}
+pingcode-client project kanban entries \
+  --project-id {project_id} \
+  --board-id {board_id}
 ```
 
 ### 4.3 创建看板
 
 ```bash
 pingcode-client project kanban create \
-  -p {project_id} \
+  --project-id {project_id} \
   --name "主看板"
 ```
 
@@ -147,24 +164,24 @@ pingcode-client project workitem update \
 
 ```bash
 # 1. 查看当前迭代情况
-pingcode-client project iteration list -p {project_id}
+pingcode-client project iteration list --project-id {project_id}
 
 # 2. 查看待发布版本
-pingcode-client project version list -p {project_id}
+pingcode-client project version list --project-id {project_id}
 
 # 3. 创建新发布版本
 pingcode-client project version create \
-  -p {project_id} \
+  --project-id {project_id} \
   --name "v1.2.0" \
   --desc "功能：OAuth登录、性能优化" \
   --release-date "2026-04-30"
 
-# 4. 查询已完成工作项（可在 Web 端将其关联到版本，CLI 暂不支持 --version-id）
+# 4. 查询已完成工作项（可在 Web 端将其关联到版本）
 #    先获取"已完成"状态 ID
 pingcode-client project metadata statuses
 #    查询已完成工作项
 pingcode-client project workitem list \
-  -p {project_id} \
+  --project-id {project_id} \
   --state-ids {done_state_id}
 
 # 5. 部署完成后更新版本的 release-date 确认发布时间
@@ -172,7 +189,7 @@ pingcode-client project version update -i {version_id} --release-date "2026-04-3
 
 # 6. 创建下一个迭代
 pingcode-client project iteration create \
-  -p {project_id} \
+  --project-id {project_id} \
   --name "Sprint 11" \
   --start-date "2026-05-01" \
   --end-date "2026-05-14"
@@ -185,3 +202,4 @@ pingcode-client project iteration create \
 - **版本 vs 迭代的区别**: 迭代（Sprint）是时间盒，描述"什么时候做"；版本（Release）是发布节点，描述"发布了什么"。两者可以组合使用。
 - **工作项必须在项目内**: 所有操作均需要 `--project-id`，请先通过 `pingcode-client project list` 确认。
 - **看板可见性**: 在 Kanban 类型项目中，工作项若未分配 `--board-id` 和 `--entry-id`，则不会在看板视图中显示。
+- **全局 flags**: 所有命令支持 `--output`（json/yaml/markdown/table）和 `--raw`（原始 API 响应）全局 flags。

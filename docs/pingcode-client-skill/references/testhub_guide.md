@@ -6,6 +6,23 @@
 
 编译完成的二进制文件为 `pingcode-client`
 
+## 全局输出格式
+
+所有命令支持 `--output` 和 `--raw` 全局 flags：
+
+```bash
+# 默认 table 格式
+pingcode-client testhub library list
+
+# JSON 格式
+pingcode-client testhub library list --output json
+
+# 原始 API 响应
+pingcode-client testhub library list --raw --output json
+```
+
+---
+
 ## 1. ID 获取速查表 (Quick Reference)
 
 | 资源类型 | 获取命令 | 备注 |
@@ -36,7 +53,10 @@
   ```
 - **更新测试库**:
   ```bash
-  pingcode-client testhub library update --id {lib_id} --name "新名称" --desc "新描述"
+  pingcode-client testhub library update \
+    --id {lib_id} \
+    --name "新名称" \
+    --desc "新描述"
   ```
 
 ### 2.2 成员管理
@@ -55,7 +75,9 @@
   ```
 - **移除成员**:
   ```bash
-  pingcode-client testhub library member remove --library-id {lib_id} --member-id {user_id}
+  pingcode-client testhub library member remove \
+    --library-id {lib_id} \
+    --member-id {user_id}
   ```
 
 ### 2.3 用例模块 (Suite)
@@ -65,11 +87,15 @@
   ```
 - **创建模块**:
   ```bash
-  pingcode-client testhub library suite create --library-id {lib_id} --name "登录功能"
+  pingcode-client testhub library suite create \
+    --library-id {lib_id} \
+    --name "登录功能"
   ```
 - **删除模块**:
   ```bash
-  pingcode-client testhub library suite delete --library-id {lib_id} --suite-id {sid}
+  pingcode-client testhub library suite delete \
+    --library-id {lib_id} \
+    --suite-id {sid}
   ```
 
 ---
@@ -99,7 +125,10 @@
   ```
 - **更新用例**:
   ```bash
-  pingcode-client testhub case update --id {case_id} --title "新标题" --desc "更新的描述"
+  pingcode-client testhub case update \
+    --id {case_id} \
+    --title "新标题" \
+    --desc "更新的描述"
   ```
 - **删除用例**:
   ```bash
@@ -174,7 +203,9 @@ pingcode-client testhub run create \
 ### 6.2 新功能用例维护
 ```bash
 # 1. 创建用例模块
-pingcode-client testhub library suite create --library-id {lib_id} --name "支付功能"
+pingcode-client testhub library suite create \
+  --library-id {lib_id} \
+  --name "支付功能"
 
 # 2. 创建测试用例
 pingcode-client testhub case create \
@@ -187,3 +218,9 @@ pingcode-client testhub case create \
 # 3. 查看用例列表确认
 pingcode-client testhub case list --library-id {lib_id}
 ```
+
+---
+
+## 7. 常见问题 (Troubleshooting)
+
+- **全局 flags**: 所有命令支持 `--output`（json/yaml/markdown/table）和 `--raw`（原始 API 响应）全局 flags。
